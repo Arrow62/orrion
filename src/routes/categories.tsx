@@ -5,7 +5,7 @@ import { AppHeader } from "@/components/olyon/chrome";
 import { PageTitle, Skel } from "@/components/olyon/ui";
 import { categoriesQuery, productsQuery } from "@/lib/shop";
 import { productImage } from "@/lib/images";
-import { categoryIcon } from "./index";
+import { categoryIcon } from "@/lib/category-icons";
 
 export const Route = createFileRoute("/categories")({
   head: () => ({

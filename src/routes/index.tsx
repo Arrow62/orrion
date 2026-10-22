@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Flower2, Gift, Leaf, Search, Shirt, Smartphone, Sparkles, Ticket } from "lucide-react";
+import { ArrowRight, Leaf, Search, Sparkles, Ticket } from "lucide-react";
+import { categoryIcon } from "@/lib/category-icons";
 import { useEffect, useState } from "react";
 import { AppHeader, ForestFooter } from "@/components/olyon/chrome";
 import { ProductCard, ProductGridSkeleton } from "@/components/olyon/product-card";
@@ -23,9 +24,6 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-export const categoryIcon: Record<string, typeof Sparkles> = {
-  sparkles: Sparkles, smartphone: Smartphone, flower: Flower2, leaf: Leaf, shirt: Shirt, gift: Gift,
-};
 
 const slides = [
   { eyebrow: "Viral on Instagram", title: ["Trending", "Products"], text: "Discover the most viral products, all in one place.", img: hero, to: { sort: "popular" as const } },
