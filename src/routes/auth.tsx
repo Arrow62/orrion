@@ -44,6 +44,8 @@ const signupSchema = z
   })
   .refine((v) => v.password === v.confirm, { path: ["confirm"], message: "Passwords don't match" });
 
+type Errs = { name?: string; email?: string; phone?: string; password?: string; confirm?: string; agree?: string };
+
 const loginSchema = z.object({
   email: z.string().trim().email("Enter a valid email"),
   password: z.string().min(1, "Enter your password"),
@@ -54,7 +56,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirm: "", agree: false });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Errs>({});
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -71,7 +73,7 @@ function AuthPage() {
     e.preventDefault();
     const parsed = (mode === "signup" ? signupSchema : loginSchema).safeParse(form);
     if (!parsed.success) {
-      setErrors(Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message])));
+      setErrors(Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message])) as Errs);
       return;
     }
     setErrors({});
@@ -83,12 +85,12 @@ function AuthPage() {
         options: { emailRedirectTo: window.location.origin + target, data: { full_name: form.name.trim(), phone: form.phone.trim() } },
       });
       setBusy(false);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
       if (!data.session) setSent(true);
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: form.email.trim(), password: form.password });
       setBusy(false);
-      if (error) return toast.error(error.message === "Invalid login credentials" ? "Email or password is incorrect" : error.message);
+      if (error) { toast.error(error.message === "Invalid login credentials" ? "Email or password is incorrect" : error.message); return; }
       toast.success("Welcome back");
     }
   };

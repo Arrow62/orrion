@@ -96,9 +96,9 @@ function ProductPage() {
         <div>
           <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-forest shadow-lift">
             <AnimatePresence mode="wait">
-              <motion.img key={view} src={productImage(p.image)} alt={`${p.name} — ${views[view].label}`} width={800} height={800}
+              <motion.img key={view} src={productImage(p.image)} alt={`${p.name} — ${views[view]!.label}`} width={800} height={800}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}
-                className={cn("size-full object-cover transition-transform duration-500", views[view].cls)} />
+                className={cn("size-full object-cover transition-transform duration-500", views[view]!.cls)} />
             </AnimatePresence>
             {p.features.length ? (
               <div className="absolute inset-y-6 right-0 hidden w-32 flex-col justify-center gap-5 rounded-l-3xl border-l border-primary-foreground/15 bg-forest/40 px-4 text-primary-foreground backdrop-blur-md sm:flex">

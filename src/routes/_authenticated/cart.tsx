@@ -42,8 +42,8 @@ function CartPage() {
   const apply = (c?: string) => {
     const want = (c ?? code).trim().toUpperCase();
     const found = coupons.data?.find((x) => x.code === want);
-    if (!found) return toast.error("That coupon code isn't valid");
-    if (t.subtotal < found.min_subtotal) return toast.error(`Add ${inr(found.min_subtotal - t.subtotal)} more to use ${found.code}`);
+    if (!found) { toast.error("That coupon code isn't valid"); return; }
+    if (t.subtotal < found.min_subtotal) { toast.error(`Add ${inr(found.min_subtotal - t.subtotal)} more to use ${found.code}`); return; }
     setCoupon(found);
     setCouponOpen(false);
     toast.success(`${found.code} applied`);

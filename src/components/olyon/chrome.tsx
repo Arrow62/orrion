@@ -7,7 +7,7 @@ import { useCartCount } from "@/lib/shop";
 import { Badge, iconBtn } from "./ui";
 import forestMist from "@/assets/forest-mist.jpg";
 
-export function Logo({ tagline = "Trending today ✦ Yours tomorrow", small }: { tagline?: string; small?: boolean }) {
+export function Logo({ tagline = "Trending today ✦ Yours tomorrow", small }: { tagline?: string | undefined; small?: boolean | undefined }) {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="Olyon home">
       <Sparkle className={cn("shrink-0 fill-primary text-primary", small ? "size-5" : "size-6")} />
@@ -35,7 +35,7 @@ export function CartButton() {
   );
 }
 
-export function AppHeader({ back, right, tagline }: { back?: boolean; right?: ReactNode; tagline?: string }) {
+export function AppHeader({ back, right, tagline }: { back?: boolean; right?: ReactNode; tagline?: string | undefined }) {
   const router = useRouter();
   return (
     <header className="sticky top-0 z-30 -mx-4 mb-4 bg-background/75 px-4 pb-3 pt-[max(env(safe-area-inset-top),0.9rem)] backdrop-blur-xl md:-mx-6 md:px-6">

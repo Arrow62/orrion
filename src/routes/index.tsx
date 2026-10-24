@@ -45,7 +45,7 @@ function Home() {
 
   const featured = (products.data ?? []).filter((p) => p.featured);
   const trending = (products.data ?? []).filter((p) => p.trending);
-  const s = slides[slide];
+  const s = slides[slide]!;
 
   return (
     <div>
