@@ -14,10 +14,10 @@ export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ mode: z.enum(["login", "signup"]).optional(), redirect: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Sign in — Olyon" },
-      { name: "description", content: "Sign in or create your Olyon account to shop, save favourites and track orders." },
-      { property: "og:title", content: "Sign in — Olyon" },
-      { property: "og:description", content: "Sign in or create your Olyon account." },
+      { title: "Sign in — Orrion" },
+      { name: "description", content: "Sign in or create your Orrion account to shop, save favourites and track orders." },
+      { property: "og:title", content: "Sign in — Orrion" },
+      { property: "og:description", content: "Sign in or create your Orrion account." },
     ],
   }),
   component: AuthPage,
@@ -107,7 +107,7 @@ function AuthPage() {
   };
 
   const oauth = async (provider: "google" | "lovable") => {
-    if (redirect) sessionStorage.setItem("olyon-redirect", target);
+    if (redirect) sessionStorage.setItem("orrion-redirect", target);
     const r = await lovable.auth.signInWithOAuth(provider, { redirect_uri: window.location.origin });
     if (r.error) toast.error(r.error.message ?? "Sign-in failed");
   };
@@ -132,7 +132,7 @@ function AuthPage() {
         <form onSubmit={submit} className="relative pb-40 pt-8" noValidate>
           <h1 className="text-[2.6rem] leading-tight">{mode === "signup" ? "Create Account" : "Welcome Back"}</h1>
           <p className="mt-2 text-muted-foreground">
-            {mode === "signup" ? "Join Olyon for early access to viral products, deals and more." : "Log in to continue your journey with Olyon."}
+            {mode === "signup" ? "Join Orrion for early access to viral products, deals and more." : "Log in to continue your journey with Orrion."}
           </p>
           <div className="mt-7 space-y-3.5">
             {mode === "signup" ? (

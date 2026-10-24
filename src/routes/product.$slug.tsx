@@ -17,10 +17,10 @@ export const Route = createFileRoute("/product/$slug")({
     const name = params.slug.split("-").map((w) => w[0]?.toUpperCase() + w.slice(1)).join(" ");
     return {
       meta: [
-        { title: `${name} — Olyon` },
-        { name: "description", content: `Shop ${name} on Olyon with cash on delivery and free shipping above ₹999.` },
-        { property: "og:title", content: `${name} — Olyon` },
-        { property: "og:description", content: `Shop ${name} on Olyon.` },
+        { title: `${name} — Orrion` },
+        { name: "description", content: `Shop ${name} on Orrion with cash on delivery and free shipping above ₹999.` },
+        { property: "og:title", content: `${name} — Orrion` },
+        { property: "og:description", content: `Shop ${name} on Orrion.` },
         { property: "og:type", content: "product" },
       ],
     };

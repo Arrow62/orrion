@@ -23,10 +23,10 @@ export const Route = createFileRoute("/shop")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Shop all products — Olyon" },
-      { name: "description", content: "Search, filter and sort Olyon's catalogue of viral gadgets, home and self-care products." },
-      { property: "og:title", content: "Shop all products — Olyon" },
-      { property: "og:description", content: "Search and filter viral finds on Olyon." },
+      { title: "Shop all products — Orrion" },
+      { name: "description", content: "Search, filter and sort Orrion's catalogue of viral gadgets, home and self-care products." },
+      { property: "og:title", content: "Shop all products — Orrion" },
+      { property: "og:description", content: "Search and filter viral finds on Orrion." },
     ],
   }),
   component: Shop,

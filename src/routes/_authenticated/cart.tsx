@@ -14,10 +14,10 @@ import { useCart, useUpdateCartQty } from "@/lib/shop";
 export const Route = createFileRoute("/_authenticated/cart")({
   head: () => ({
     meta: [
-      { title: "Your cart — Olyon" },
-      { name: "description", content: "Review the items in your Olyon cart." },
-      { property: "og:title", content: "Your cart — Olyon" },
-      { property: "og:description", content: "Review your Olyon cart." },
+      { title: "Your cart — Orrion" },
+      { name: "description", content: "Review the items in your Orrion cart." },
+      { property: "og:title", content: "Your cart — Orrion" },
+      { property: "og:description", content: "Review your Orrion cart." },
     ],
   }),
   component: CartPage,

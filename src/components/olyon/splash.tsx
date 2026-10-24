@@ -6,12 +6,12 @@ import bird from "@/assets/splash-bird.jpg";
 export function Splash() {
   const [show, setShow] = useState(true);
   useEffect(() => {
-    if (sessionStorage.getItem("olyon-splash")) {
+    if (sessionStorage.getItem("orrion-splash")) {
       setShow(false);
       return;
     }
     const t = setTimeout(() => {
-      sessionStorage.setItem("olyon-splash", "1");
+      sessionStorage.setItem("orrion-splash", "1");
       setShow(false);
     }, 1900);
     return () => clearTimeout(t);
@@ -25,7 +25,7 @@ export function Splash() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-between overflow-hidden bg-background py-[12vh]"
           role="status"
-          aria-label="Loading Olyon"
+          aria-label="Loading Orrion"
         >
           <img src={bird} alt="" width={768} height={1024}
             className="absolute inset-0 size-full object-cover object-left-bottom opacity-90" />
@@ -33,7 +33,7 @@ export function Splash() {
             className="relative text-center">
             <div className="flex items-center justify-center gap-3">
               <Sparkle className="size-8 fill-primary text-primary" />
-              <span className="font-brand text-4xl tracking-[0.2em] text-primary">OLYON</span>
+              <span className="font-brand text-4xl tracking-[0.2em] text-primary">ORRION</span>
             </div>
             <p className="mt-3 eyebrow text-primary/80">Trending today ✦ Yours tomorrow</p>
           </motion.div>

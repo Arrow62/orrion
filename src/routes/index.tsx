@@ -15,9 +15,9 @@ import galaxy from "@/assets/p-galaxy.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Olyon — Trending today, yours tomorrow" },
+      { title: "Orrion — Trending today, yours tomorrow" },
       { name: "description", content: "Shop viral gadgets, home essentials and self-care finds with free shipping above ₹999 and cash on delivery." },
-      { property: "og:title", content: "Olyon — Trending today, yours tomorrow" },
+      { property: "og:title", content: "Orrion — Trending today, yours tomorrow" },
       { property: "og:description", content: "Viral gadgets, home and self-care finds. Cash on delivery across India." },
     ],
   }),

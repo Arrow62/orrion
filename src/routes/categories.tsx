@@ -10,10 +10,10 @@ import { categoryIcon } from "@/lib/category-icons";
 export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
-      { title: "Categories — Olyon" },
-      { name: "description", content: "Browse Olyon by category: home, tech, beauty, wellness, fashion and gifts." },
-      { property: "og:title", content: "Categories — Olyon" },
-      { property: "og:description", content: "Browse Olyon by category." },
+      { title: "Categories — Orrion" },
+      { name: "description", content: "Browse Orrion by category: home, tech, beauty, wellness, fashion and gifts." },
+      { property: "og:title", content: "Categories — Orrion" },
+      { property: "og:description", content: "Browse Orrion by category." },
     ],
   }),
   component: Categories,
