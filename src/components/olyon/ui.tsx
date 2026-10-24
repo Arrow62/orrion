@@ -123,7 +123,7 @@ export function Pill({ children, tone = "olive" }: { children: ReactNode; tone?:
 
 export function Field({
   icon, error, className, ...p
-}: React.InputHTMLAttributes<HTMLInputElement> & { icon?: ReactNode; error?: string }) {
+}: React.InputHTMLAttributes<HTMLInputElement> & { icon?: ReactNode | undefined; error?: string | undefined }) {
   return (
     <label className={cn("block", className)}>
       <span className={cn(

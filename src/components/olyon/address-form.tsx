@@ -40,7 +40,7 @@ export function AddressForm({ initial, onDone, onCancel }: { initial?: Address; 
       : supabase.from("addresses").insert({ ...p.data, user_id: user!.id }).select().single();
     const { data, error } = await q;
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["addresses"] });
     toast.success("Address saved");
     onDone(data);
