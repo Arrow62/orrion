@@ -9,11 +9,11 @@ import forestMist from "@/assets/forest-mist.jpg";
 
 export function Logo({ tagline = "Trending today ✦ Yours tomorrow", small }: { tagline?: string | undefined; small?: boolean | undefined }) {
   return (
-    <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="Olyon home">
+    <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="Orrion home">
       <Sparkle className={cn("shrink-0 fill-primary text-primary", small ? "size-5" : "size-6")} />
       <span className="min-w-0">
         <span className={cn("block font-brand leading-none tracking-[0.18em] text-primary", small ? "text-lg" : "text-[1.55rem]")}>
-          OLYON
+          ORRION
         </span>
         {tagline ? (
           <span className="mt-1 block truncate text-[0.58rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">

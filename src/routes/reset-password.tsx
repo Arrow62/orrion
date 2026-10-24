@@ -9,10 +9,10 @@ import { Logo } from "@/components/olyon/chrome";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset password — Olyon" },
-      { name: "description", content: "Choose a new password for your Olyon account." },
-      { property: "og:title", content: "Reset password — Olyon" },
-      { property: "og:description", content: "Choose a new password for your Olyon account." },
+      { title: "Reset password — Orrion" },
+      { name: "description", content: "Choose a new password for your Orrion account." },
+      { property: "og:title", content: "Reset password — Orrion" },
+      { property: "og:description", content: "Choose a new password for your Orrion account." },
     ],
   }),
   component: Reset,
@@ -31,7 +31,7 @@ function Reset() {
     setBusy(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Password updated");
     navigate({ to: "/" });
   };
