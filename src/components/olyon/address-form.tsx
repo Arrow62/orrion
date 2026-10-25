@@ -16,7 +16,7 @@ export const addressSchema = z.object({
   pincode: z.string().trim().regex(/^[0-9]{6}$/, "Enter a 6-digit PIN code"),
 });
 
-export function AddressForm({ initial, onDone, onCancel }: { initial?: Address; onDone: (a: Address) => void; onCancel?: () => void }) {
+export function AddressForm({ initial, onDone, onCancel }: { initial?: Address | undefined; onDone: (a: Address) => void; onCancel?: (() => void) | undefined }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [v, setV] = useState({
