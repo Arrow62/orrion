@@ -7,6 +7,7 @@ import { AppHeader } from "@/components/olyon/chrome";
 import { ProductCard } from "@/components/olyon/product-card";
 import { Btn, Pill, QtyStepper, SectionTitle, Skel, Stars } from "@/components/olyon/ui";
 import { productImage } from "@/lib/images";
+import { DeliveryInfo, Highlights, ProductFaq, RatingsSummary } from "@/components/olyon/product-sections";
 import { inr, percentOff, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import { colorsOf, productQuery, productsQuery, useAddToCart, useToggleWishlist } from "@/lib/shop";
 import { useAuth } from "@/lib/auth";
@@ -122,7 +123,7 @@ function ProductPage() {
         <div className="mt-6 lg:mt-0">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
             <div className="min-w-0">
-              <h1 className="text-[2.1rem] leading-tight">{p.name}</h1>
+              <h1 className="text-3xl leading-tight">{p.name}</h1>
               <p className="mt-1 text-foreground/80">{p.tagline}</p>
             </div>
             {p.badge ? <Pill tone="plum"><Flame className="size-3.5 text-destructive" /> {p.badge}</Pill> : null}
@@ -196,6 +197,13 @@ function ProductPage() {
           </p>
         </div>
       </div>
+
+      <Highlights p={p} />
+      <div className="lg:grid lg:grid-cols-2 lg:gap-4">
+        <DeliveryInfo />
+        <RatingsSummary p={p} />
+      </div>
+      <ProductFaq p={p} />
 
       {related.length ? (
         <section className="mt-12">
