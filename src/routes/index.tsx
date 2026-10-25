@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { AppHeader, ForestFooter } from "@/components/olyon/chrome";
 import { ProductCard, ProductGridSkeleton } from "@/components/olyon/product-card";
 import { SectionTitle, Skel } from "@/components/olyon/ui";
+import { BestSellers, DealOfDay, EditorialBanners, NewArrivals, TrustStrip } from "@/components/olyon/home-sections";
 import { categoriesQuery, productsQuery } from "@/lib/shop";
 import hero from "@/assets/hero.jpg";
 import diffuser from "@/assets/p-diffuser.jpg";
@@ -80,10 +81,10 @@ function Home() {
             <motion.div key={slide} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
               className="max-w-[62%] text-primary-foreground md:max-w-md">
               <p className="eyebrow opacity-90">{s.eyebrow}</p>
-              <h1 className="mt-3 text-[2.6rem] leading-[0.95] md:text-6xl">{s.title[0]}<br />{s.title[1]}</h1>
+              <h1 className="mt-3 text-[2.2rem] leading-[1] md:text-5xl">{s.title[0]}<br />{s.title[1]}</h1>
               <p className="mt-3 text-sm opacity-85 md:text-base">{s.text}</p>
               <Link to="/shop" search={s.to}
-                className="mt-5 inline-flex h-11 items-center gap-2 rounded-full border border-primary-foreground/25 bg-olive/90 px-5 text-sm font-semibold backdrop-blur active:scale-95">
+                className="mt-5 inline-flex h-11 items-center gap-2 rounded-full bg-plum-gradient shadow-glow px-5 text-sm font-semibold backdrop-blur active:scale-95">
                 Shop Now <ArrowRight className="size-4" />
               </Link>
             </motion.div>
@@ -127,6 +128,10 @@ function Home() {
         </div>
       </section>
 
+      {products.data ? <DealOfDay products={products.data} /> : null}
+      <EditorialBanners />
+      {products.data ? <NewArrivals products={products.data} /> : null}
+
       {/* Promo */}
       <section className="relative mt-10 overflow-hidden rounded-[2rem] bg-plum-gradient p-6 text-primary-foreground shadow-lift md:p-10">
         <Leaf className="absolute -right-6 -top-6 size-40 rotate-12 animate-sway opacity-10" />
@@ -137,7 +142,7 @@ function Home() {
           <span className="inline-flex h-11 items-center gap-2 rounded-full border border-dashed border-primary-foreground/40 px-4 font-brand text-sm tracking-widest">
             <Ticket className="size-4" /> FOREST10
           </span>
-          <Link to="/shop" className="inline-flex h-11 items-center gap-2 rounded-full bg-primary-foreground px-5 text-sm font-semibold text-primary active:scale-95">
+          <Link to="/shop" className="inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background active:scale-95">
             Start shopping <ArrowRight className="size-4" />
           </Link>
         </div>
@@ -151,6 +156,8 @@ function Home() {
           {products.isLoading ? <ProductGridSkeleton n={4} /> : trending.map((p, i) => <ProductCard key={p.id} p={p} index={i} />)}
         </div>
       </section>
+      {products.data ? <BestSellers products={products.data} /> : null}
+      <TrustStrip />
       <ForestFooter />
     </div>
   );
