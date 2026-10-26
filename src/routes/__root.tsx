@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { usePageMotion } from "@/lib/gsap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
@@ -11,9 +10,9 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { MotionConfig, motion } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
