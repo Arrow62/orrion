@@ -13,7 +13,7 @@ export function Highlights({ p }: { p: Product }) {
     ["Payment", "Cash on Delivery"],
   ];
   return (
-    <section className="mt-12 grid gap-4 md:grid-cols-2">
+    <section data-reveal className="mt-12 grid gap-4 md:grid-cols-2">
       <div className="surface rounded-3xl p-5">
         <SectionTitle>Key Highlights</SectionTitle>
         <ul className="space-y-3">

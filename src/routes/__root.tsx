@@ -1,3 +1,4 @@
+import { usePageMotion } from "@/lib/gsap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -9,9 +10,9 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { MotionConfig, motion } from "framer-motion";
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -113,20 +114,19 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const { pathname } = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  usePageMotion(mainRef, pathname);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <MotionConfig reducedMotion="user">
           <Splash />
-          <motion.main
-            key={pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          <main
+            ref={mainRef}
             className="mx-auto min-h-screen w-full max-w-md px-4 pb-safe-nav md:max-w-3xl md:px-6 lg:max-w-6xl"
           >
             <Outlet />
-          </motion.main>
+          </main>
           <BottomNav />
           <Toaster position="top-center" toastOptions={{ className: "!rounded-2xl !font-sans" }} />
         </MotionConfig>

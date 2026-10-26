@@ -1,20 +1,23 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, Sparkle, User } from "lucide-react";
-import type { ReactNode } from "react";
+import { ArrowLeft, Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, User } from "lucide-react";
+import { useRef, type ReactNode } from "react";
+import { gsap, useIsoLayoutEffect } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 import { useCartCount } from "@/lib/shop";
-import { Badge, iconBtn } from "./ui";
+import { Badge } from "./ui";
 import forestMist from "@/assets/forest-mist.jpg";
 
 export function Logo({ small }: { tagline?: string | undefined; small?: boolean | undefined }) {
   return (
-    <Link to="/" className="inline-flex items-center gap-2" aria-label="Orrion home">
-      <Sparkle className={cn("shrink-0 fill-primary text-primary", small ? "size-3.5" : "size-4")} />
-      <span className={cn("font-brand font-semibold leading-none tracking-[0.32em] text-foreground", small ? "text-lg" : "text-[1.45rem]")}>
+    <Link to="/" className="group inline-flex items-center gap-1.5" aria-label="Orrion home">
+      <span className="relative grid size-4 place-items-center">
+        <span className="absolute inset-0 rounded-full border border-olive/60 animate-orbit [border-top-color:transparent]" />
+        <span className="size-1.5 rounded-full bg-primary shadow-glow" />
+      </span>
+      <span className={cn("font-brand font-semibold leading-none tracking-[0.42em] text-foreground", small ? "text-[0.8rem]" : "text-[0.92rem]")}>
         ORRION
       </span>
-      <Sparkle className={cn("shrink-0 fill-olive text-olive", small ? "size-3.5" : "size-4")} />
     </Link>
   );
 }
@@ -22,43 +25,57 @@ export function Logo({ small }: { tagline?: string | undefined; small?: boolean 
 export function CartButton() {
   const count = useCartCount();
   return (
-    <Link to="/cart" className={iconBtn({ variant: "plum" })} aria-label={`Cart, ${count} items`}>
-      <ShoppingBag className="size-[18px]" />
+    <Link to="/cart" className="relative grid size-8 place-items-center rounded-full bg-plum-gradient text-primary-foreground shadow-glow active:scale-90" aria-label={`Cart, ${count} items`}>
+      <ShoppingBag className="size-[14px]" strokeWidth={2} />
       <Badge count={count} />
     </Link>
   );
 }
 
-/** Centered-wordmark header: action left, title center, search + cart right. */
+const hudBtn = "grid size-8 place-items-center rounded-full text-foreground/80 transition hover:bg-secondary hover:text-foreground active:scale-90";
+
+/** Floating HUD capsule header: action left, wordmark center, search + cart right. */
 export function AppHeader({ back, right }: { back?: boolean; right?: ReactNode; tagline?: string | undefined }) {
   const router = useRouter();
+  const ref = useRef<HTMLElement>(null);
+  useIsoLayoutEffect(() => {
+    if (!ref.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from("[data-hud]", { y: -18, autoAlpha: 0, duration: 0.8, ease: "expo.out" });
+      gsap.from("[data-hud-item]", { y: -6, autoAlpha: 0, duration: 0.6, stagger: 0.06, delay: 0.15, ease: "power3.out" });
+    }, ref);
+    return () => ctx.revert();
+  }, []);
   return (
-    <header className="sticky top-0 z-30 -mx-4 mb-5 px-4 pt-[max(env(safe-area-inset-top),0.75rem)] md:-mx-6 md:px-6">
-      <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-b-3xl border-b border-border/70 bg-background/80 backdrop-blur-xl">
-        <div className="flex items-center">
+    <header ref={ref} className="sticky top-0 z-30 -mx-4 mb-4 px-3 pt-[max(env(safe-area-inset-top),0.6rem)] md:-mx-6 md:px-5">
+      <div data-hud className="hud-glass relative grid h-12 grid-cols-[1fr_auto_1fr] items-center overflow-hidden rounded-full px-2">
+        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent via-foreground/[0.06] to-transparent animate-scan" aria-hidden />
+        <div className="flex items-center gap-1" data-hud-item>
           {back ? (
-            <button onClick={() => router.history.back()} className={iconBtn()} aria-label="Go back">
-              <ArrowLeft className="size-[18px]" />
+            <button onClick={() => router.history.back()} className={hudBtn} aria-label="Go back">
+              <ArrowLeft className="size-[15px]" />
             </button>
           ) : (
-            <Link to="/categories" className={iconBtn()} aria-label="Browse categories">
-              <Menu className="size-[18px]" />
+            <Link to="/categories" className={hudBtn} aria-label="Browse categories">
+              <Menu className="size-[15px]" />
             </Link>
           )}
+          <span className="hidden items-center gap-1.5 font-mono-ui text-[9px] uppercase text-muted-foreground sm:flex">
+            <span className="size-1.5 animate-pulse rounded-full bg-olive" /> Live
+          </span>
         </div>
-        <Logo small={back} />
-        <div className="flex items-center justify-end gap-2">
+        <div data-hud-item><Logo small={back} /></div>
+        <div className="flex items-center justify-end gap-1" data-hud-item>
           {right ?? (
             <>
-              <Link to="/shop" className={iconBtn()} aria-label="Search">
-                <Search className="size-[18px]" />
+              <Link to="/shop" className={hudBtn} aria-label="Search">
+                <Search className="size-[15px]" />
               </Link>
               <CartButton />
             </>
           )}
         </div>
       </div>
-      <div className="mx-auto mt-0 h-px w-24 bg-gradient-to-r from-transparent via-primary to-transparent" aria-hidden />
     </header>
   );
 }
