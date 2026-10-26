@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Flame, Gift, Heart, Leaf, ShieldCheck, ShoppingBag, Truck, Zap, Sparkle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Flame, Gift, Heart, Leaf, ShieldCheck, ShoppingBag, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { gsap, useIsoLayoutEffect } from "@/lib/gsap";
 import { AppHeader } from "@/components/olyon/chrome";
 import { ProductCard } from "@/components/olyon/product-card";
-import { Btn, Pill, QtyStepper, SectionTitle, Skel, Stars } from "@/components/olyon/ui";
+import { Btn, QtyStepper, SectionTitle, Skel, Stars } from "@/components/olyon/ui";
 import { productImage } from "@/lib/images";
 import { DeliveryInfo, Highlights, ProductFaq, RatingsSummary } from "@/components/olyon/product-sections";
 import { inr, percentOff, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
@@ -47,6 +48,28 @@ function ProductPage() {
   const [view, setView] = useState(0);
   const [color, setColor] = useState("");
   const [qty, setQty] = useState(1);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  useIsoLayoutEffect(() => {
+    if (!pageRef.current || !p) return;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+      tl.from("[data-portal]", { scale: 0.6, autoAlpha: 0, duration: 1.2 })
+        .from("[data-orbit]", { rotate: -120, autoAlpha: 0, duration: 1.6, transformOrigin: "50% 50%" }, 0)
+        .from("[data-hotspot]", { scale: 0, autoAlpha: 0, duration: 0.6, stagger: 0.12, ease: "back.out(2)" }, 0.5)
+        .from("[data-in]", { y: 18, autoAlpha: 0, duration: 0.7, stagger: 0.06 }, 0.3)
+        .from("[data-dock]", { y: 80, autoAlpha: 0, duration: 0.9 }, 0.6);
+      gsap.to("[data-orbit]", { rotate: 360, duration: 50, ease: "none", repeat: -1, transformOrigin: "50% 50%", delay: 1.6 });
+      gsap.to("[data-hotspot]", { y: -4, duration: 2, yoyo: true, repeat: -1, ease: "sine.inOut", stagger: 0.5, delay: 1.2 });
+    }, pageRef);
+    return () => ctx.revert();
+  }, [p?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useIsoLayoutEffect(() => {
+    if (!pageRef.current) return;
+    const ctx = gsap.context(() => gsap.fromTo("[data-shot]", { scale: 1.25, rotate: -6, autoAlpha: 0 }, { scale: 1, rotate: 0, autoAlpha: 1, duration: 0.8, ease: "expo.out", clearProps: "scale,rotate" }), pageRef);
+    return () => ctx.revert();
+  }, [view]);
 
   useEffect(() => {
     if (p) setColor(colorsOf(p)[0]?.name ?? "");
@@ -91,110 +114,124 @@ function ProductPage() {
   };
 
   return (
-    <div>
-      <AppHeader back tagline="Viral products ✦ Better you" />
-      <div className="lg:grid lg:grid-cols-2 lg:gap-10">
-        <div>
-          <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-forest shadow-lift">
-            <AnimatePresence mode="wait">
-              <motion.img key={view} src={productImage(p.image)} alt={`${p.name} — ${views[view]!.label}`} width={800} height={800}
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}
-                className={cn("size-full object-cover transition-transform duration-500", views[view]!.cls)} />
-            </AnimatePresence>
-            {p.features.length ? (
-              <div className="absolute inset-y-6 right-0 hidden w-32 flex-col justify-center gap-5 rounded-l-3xl border-l border-primary-foreground/15 bg-forest/40 px-4 text-primary-foreground backdrop-blur-md sm:flex">
-                {p.features.slice(0, 4).map((f) => (
-                  <div key={f} className="text-xs leading-snug"><Sparkle className="mb-1 size-4" />{f}</div>
-                ))}
-              </div>
-            ) : null}
-            <span className="absolute bottom-4 right-4 rounded-full bg-forest/60 px-2.5 py-1 text-xs text-primary-foreground backdrop-blur">{view + 1}/{views.length}</span>
+    <div ref={pageRef}>
+      <AppHeader back />
+      <div className="lg:grid lg:grid-cols-[1.1fr_1fr] lg:gap-8">
+        {/* Specimen stage */}
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-border bg-forest" aria-label="Product viewer">
+          <div className="absolute inset-0 grid-lines opacity-70" />
+          <div className="relative flex items-center justify-between px-4 pt-4 font-mono-ui text-[9px] uppercase text-muted-foreground">
+            <span>Specimen / {p.category}</span>
+            <span>View {String(view + 1).padStart(2, "0")}—{String(views.length).padStart(2, "0")}</span>
           </div>
-          <div className="mt-3 grid grid-cols-4 gap-2.5">
+          <div className="relative mx-auto my-4 aspect-square w-[82%] max-w-md">
+            <svg data-orbit viewBox="0 0 200 200" className="absolute inset-[-6%] size-[112%] text-olive/50" aria-hidden>
+              <circle cx="100" cy="100" r="98" fill="none" stroke="currentColor" strokeWidth="0.4" strokeDasharray="1 4" />
+              <circle cx="100" cy="2" r="2.2" className="fill-primary" />
+              <circle cx="2" cy="100" r="1.4" className="fill-olive" />
+            </svg>
+            <div data-portal className="absolute inset-0 overflow-hidden rounded-full ring-1 ring-foreground/10 shadow-lift">
+              <img key={view} data-shot src={productImage(p.image)} alt={`${p.name} — ${views[view]!.label}`} width={800} height={800}
+                className={cn("size-full object-cover transition-transform duration-700", views[view]!.cls)} />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,transparent_40%,var(--forest)_100%)]" />
+            </div>
+            {p.features.slice(0, 3).map((f, i) => {
+              const pos = [
+                "left-[-4%] top-[14%]", "right-[-6%] top-[44%]", "left-[2%] bottom-[8%]",
+              ][i]!;
+              return (
+                <div key={f} data-hotspot className={cn("hud-glass absolute flex max-w-[9.5rem] items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5", pos)}>
+                  <span className="grid size-4 shrink-0 place-items-center rounded-full bg-primary/20"><span className="size-1.5 rounded-full bg-primary" /></span>
+                  <span className="truncate text-[9.5px] text-foreground/85">{f}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="relative flex items-center justify-center gap-2 pb-4">
             {views.map((v, i) => (
               <button key={v.label} onClick={() => setView(i)} aria-label={`Show ${v.label}`} aria-pressed={view === i}
-                className={cn("aspect-[5/4] overflow-hidden rounded-2xl ring-2 transition", view === i ? "ring-olive" : "ring-transparent opacity-80")}>
-                <img src={productImage(p.image)} alt="" loading="lazy" width={160} height={128} className={cn("size-full object-cover", v.cls)} />
+                className={cn("size-11 overflow-hidden rounded-full ring-1 transition", view === i ? "ring-2 ring-olive" : "opacity-50 ring-border hover:opacity-90")}>
+                <img src={productImage(p.image)} alt="" loading="lazy" width={88} height={88} className={cn("size-full object-cover", v.cls)} />
               </button>
             ))}
           </div>
-        </div>
+          {p.badge ? (
+            <span className="absolute left-4 top-10 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 font-mono-ui text-[9px] uppercase text-primary-foreground">
+              <Flame className="size-3" /> {p.badge}
+            </span>
+          ) : null}
+        </section>
 
-        <div className="mt-6 lg:mt-0">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-            <div className="min-w-0">
-              <h1 className="text-3xl leading-tight">{p.name}</h1>
-              <p className="mt-1 text-foreground/80">{p.tagline}</p>
+        {/* Data sheet */}
+        <section className="mt-5 lg:mt-0" aria-label="Product details">
+          <p data-in className="font-mono-ui text-[9px] uppercase text-olive">Orrion edit · No. {p.id.slice(0, 4)}</p>
+          <h1 data-in className="mt-1.5 text-[1.65rem] leading-[1.08]">{p.name}</h1>
+          <p data-in className="mt-1 text-[0.82rem] text-muted-foreground">{p.tagline}</p>
+
+          <div data-in className="mt-4 flex items-end justify-between gap-3">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-semibold tabular-nums">{inr(p.price)}</span>
+              {p.compare_at ? <span className="text-xs text-muted-foreground line-through">{inr(p.compare_at)}</span> : null}
             </div>
-            {p.badge ? <Pill tone="plum"><Flame className="size-3.5 text-destructive" /> {p.badge}</Pill> : null}
+            {off ? <span className="rounded-full border border-olive/50 px-2 py-0.5 font-mono-ui text-[9px] text-olive">SAVE {off}%</span> : null}
           </div>
-          <div className="mt-3 flex items-center gap-2 text-sm">
-            <Stars rating={Number(p.rating)} />
-            <span className="font-semibold">{Number(p.rating).toFixed(1)}</span>
-            <span className="text-muted-foreground">({p.reviews.toLocaleString("en-IN")} reviews)</span>
-          </div>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="text-4xl font-bold">{inr(p.price)}</span>
-            {p.compare_at ? <span className="text-lg text-muted-foreground line-through">{inr(p.compare_at)}</span> : null}
-            {off ? <span className="rounded-full bg-olive px-3 py-1 text-sm font-semibold text-olive-foreground">{off}% OFF</span> : null}
-          </div>
-          <p className={cn("mt-2 text-sm font-medium", soldOut ? "text-destructive" : p.stock <= 10 ? "text-primary" : "text-success")}>
-            {soldOut ? "Out of stock" : p.stock <= 10 ? `Only ${p.stock} left — order soon` : "In stock, ready to ship"}
-          </p>
 
-          <div className="my-5 grid grid-cols-4 gap-2 border-y border-border py-5 text-center text-[11px] leading-tight">
+          <dl data-in className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface/60 font-mono-ui text-[10px] uppercase">
             {[
-              { i: Leaf, t: "Thoughtfully sourced" },
-              { i: Gift, t: "Great for gifts" },
-              { i: ShieldCheck, t: "7-day easy returns" },
-              { i: Truck, t: `Free ship above ₹${FREE_SHIPPING_THRESHOLD}` },
-            ].map(({ i: I, t }) => (
-              <div key={t} className="flex flex-col items-center gap-2">
-                <span className="grid size-11 place-items-center rounded-full bg-secondary"><I className="size-5 text-olive" strokeWidth={1.6} /></span>
-                {t}
+              ["Rating", <span key="r" className="flex items-center gap-1.5 normal-case"><Stars rating={Number(p.rating)} className="[&_svg]:size-3" />{Number(p.rating).toFixed(1)} · {p.reviews.toLocaleString("en-IN")}</span>],
+              ["Status", <span key="s" className={soldOut ? "text-destructive" : p.stock <= 10 ? "text-primary" : "text-success"}>{soldOut ? "Out of stock" : p.stock <= 10 ? `Only ${p.stock} left` : "In stock"}</span>],
+              ["Shipping", `Free above ₹${FREE_SHIPPING_THRESHOLD}`],
+              ["Payment", "Cash on delivery"],
+              ["Returns", "7-day easy"],
+            ].map(([k, v]) => (
+              <div key={String(k)} className="flex items-center justify-between px-3.5 py-2.5">
+                <dt className="text-muted-foreground">{k}</dt><dd className="text-foreground/90">{v}</dd>
               </div>
             ))}
-          </div>
+          </dl>
 
-          <p className="text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+          <p data-in className="mt-4 text-[0.82rem] leading-relaxed text-muted-foreground">{p.description}</p>
 
-          <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
+          <div data-in className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             {colors.length ? (
               <div>
-                <p className="mb-2 text-sm">Color: <span className="font-semibold">{color}</span></p>
-                <div className="flex gap-3" role="radiogroup" aria-label="Color">
+                <p className="mb-2 font-mono-ui text-[9px] uppercase text-muted-foreground">Finish — <span className="text-foreground">{color}</span></p>
+                <div className="flex gap-2" role="radiogroup" aria-label="Color">
                   {colors.map((c) => (
                     <button key={c.name} role="radio" aria-checked={color === c.name} aria-label={c.name} onClick={() => setColor(c.name)}
-                      className={cn("grid size-12 place-items-center rounded-full border-2 transition", color === c.name ? "border-olive" : "border-transparent")}>
-                      <span className="size-9 rounded-full shadow-inner ring-1 ring-border" style={{ backgroundColor: c.hex }} />
+                      className={cn("grid size-9 place-items-center rounded-full border transition", color === c.name ? "border-olive" : "border-transparent")}>
+                      <span className="size-6 rounded-full ring-1 ring-border" style={{ backgroundColor: c.hex }} />
                     </button>
                   ))}
                 </div>
               </div>
             ) : <div />}
             <div>
-              <p className="mb-2 text-sm">Quantity</p>
+              <p className="mb-2 font-mono-ui text-[9px] uppercase text-muted-foreground">Qty</p>
               <QtyStepper value={qty} onChange={setQty} max={Math.max(1, Math.min(p.stock, 20))} />
             </div>
           </div>
-
-          <div className="mt-6 flex gap-3">
-            <Btn size="lg" className="flex-1" disabled={soldOut} loading={add.isPending}
-              onClick={() => add.mutate({ product: p, color, quantity: qty })}>
-              <ShoppingBag className="size-5" /> {soldOut ? "Sold out" : "Add to Cart"}
-            </Btn>
-            <motion.button whileTap={{ scale: 0.85 }} onClick={() => wl.toggle(p)} aria-pressed={saved}
-              aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
-              className="surface grid size-14 shrink-0 place-items-center rounded-full">
-              <Heart className={cn("size-6", saved ? "fill-primary text-primary" : "text-primary")} />
-            </motion.button>
-          </div>
-          <Btn variant="olive" size="lg" className="mt-3 w-full" disabled={soldOut} onClick={buyNow}>
-            <Zap className="size-5" /> Buy Now
-          </Btn>
-          <p className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Leaf className="size-4 text-olive" /> Cash on Delivery available ✦ Secure checkout
+          <p data-in className="mt-5 flex items-center gap-2 text-[11px] text-muted-foreground">
+            <Leaf className="size-3.5 text-olive" /> Thoughtfully sourced <Gift className="ml-2 size-3.5 text-olive" /> Gift-ready <ShieldCheck className="ml-2 size-3.5 text-olive" /> Secure
           </p>
+        </section>
+      </div>
+
+      {/* Floating action dock */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5.2rem+env(safe-area-inset-bottom))] z-30 px-4">
+        <div data-dock className="hud-glass pointer-events-auto mx-auto flex max-w-sm items-center gap-2 rounded-full p-1.5">
+          <motion.button whileTap={{ scale: 0.85 }} onClick={() => wl.toggle(p)} aria-pressed={saved}
+            aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-secondary">
+            <Heart className={cn("size-4", saved ? "fill-primary text-primary" : "text-foreground")} />
+          </motion.button>
+          <Btn size="sm" variant="outline" className="h-10 flex-1 text-[0.78rem]" disabled={soldOut} loading={add.isPending}
+            onClick={() => add.mutate({ product: p, color, quantity: qty })}>
+            <ShoppingBag className="size-4" /> {soldOut ? "Sold out" : "Add"}
+          </Btn>
+          <Btn size="sm" className="h-10 flex-[1.3] text-[0.78rem]" disabled={soldOut} onClick={buyNow}>
+            <Zap className="size-4" /> Buy · {inr(p.price * qty)}
+          </Btn>
         </div>
       </div>
 
