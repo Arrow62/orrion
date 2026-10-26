@@ -103,7 +103,7 @@ export function PageTitle({ title, sub, aside }: { title: string; sub?: string; 
   return (
     <div className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
       <div className="min-w-0">
-        <h1 className="text-4xl font-medium leading-tight md:text-5xl">{title}</h1>
+        <h1 className="text-[1.7rem] leading-tight md:text-4xl">{title}</h1>
         {sub ? <p className="mt-1 text-muted-foreground">{sub}</p> : null}
       </div>
       {aside}
