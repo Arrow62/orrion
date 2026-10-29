@@ -50,6 +50,10 @@
   --color-plum-soft: var(--plum-soft);
   --color-surface: var(--surface);
   --color-success: var(--success);
+  --color-paper: var(--paper);
+  --color-paper-foreground: var(--paper-foreground);
+  --color-paper-muted: var(--paper-muted);
+  --color-ink: var(--ink);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -85,6 +89,10 @@
   --olive-foreground: oklch(0.98 0.008 85);
   --olive-soft: oklch(0.3 0.04 120);
   --forest: oklch(0.13 0.004 60);
+  --paper: oklch(0.93 0.015 85);
+  --paper-foreground: oklch(0.18 0.005 60);
+  --paper-muted: oklch(0.5 0.01 70);
+  --ink: oklch(0.2 0.005 60);
   --success: oklch(0.72 0.11 125);
   --secondary: oklch(0.26 0.005 60);
   --secondary-foreground: oklch(0.95 0.008 85);
