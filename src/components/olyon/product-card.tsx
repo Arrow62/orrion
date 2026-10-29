@@ -88,7 +88,7 @@ export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
             if (heart.current) gsap.fromTo(heart.current, { scale: 0.6 }, { scale: 1, duration: 0.6, ease: "elastic.out(1.2,0.4)" });
             wl.toggle(p);
           }}
-          aria label={saved ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={saved}
           className="absolute right-2.5 top-2.5 grid size-7 place-items-center rounded-full border border-paper-foreground/25"
         >

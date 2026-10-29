@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AppHeader, ForestFooter } from "@/components/olyon/chrome";
 import { ProductCard, ProductGridSkeleton } from "@/components/olyon/product-card";
 import { SectionTitle, Skel } from "@/components/olyon/ui";
-import { BestSellers, DealOfDay, EditorialBanners, NewArrivals, TrustStrip } from "@/components/olyon/home-sections";
+import { BestSellers, DealOfDay, SpotlightBanners, EditorialBanners, NewArrivals, TrustStrip } from "@/components/olyon/home-sections";
 import { HeroOrbit } from "@/components/olyon/hero";
 import { categoriesQuery, productsQuery } from "@/lib/shop";
 
@@ -53,6 +53,7 @@ function Home() {
       </form>
 
       <HeroOrbit />
+      {products.data ? <SpotlightBanners products={products.data} /> : null}
 
       {/* Categories */}
       <section className="mt-8" aria-label="Categories">

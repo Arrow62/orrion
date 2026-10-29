@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowRight, Banknote, RotateCcw, ShieldCheck, Timer, Truck } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, ArrowUpRight, Banknote, Heart, Plus, RotateCcw, ShieldCheck, Timer, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { productImage } from "@/lib/images";
 import { inr, percentOff } from "@/lib/pricing";
-import type { Product } from "@/lib/shop";
+import { colorsOf, useAddToCart, useToggleWishlist, type Product } from "@/lib/shop";
 import { Pill, SectionTitle, Stars } from "./ui";
 import earbuds from "@/assets/p-earbuds.jpg";
 import silk from "@/assets/p-silk.jpg";
@@ -139,6 +139,61 @@ export function TrustStrip() {
           <span className="min-w-0"><span className="block text-sm font-semibold">{t}</span><span className="text-xs text-muted-foreground">{s}</span></span>
         </div>
       ))}
+    </section>
+  );
+}
+
+export function SpotlightBanners({ products }: { products: Product[] }) {
+  const navigate = useNavigate();
+  const add = useAddToCart();
+  const wl = useToggleWishlist();
+  const list = [...products].filter((p) => p.stock > 0 && p.compare_at).sort((a, b) => percentOff(b.price, b.compare_at) - percentOff(a.price, a.compare_at)).slice(0, 3);
+  if (!list.length) return null;
+  return (
+    <section data-reveal className="mt-8" aria-label="Spotlight">
+      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+        {list.map((p) => {
+          const color = colorsOf(p)[0]?.name ?? "";
+          const saved = wl.has(p.id);
+          const [l1, ...rest] = (p.tagline || p.name).split(/(?<=\.)\s+/);
+          return (
+            <article key={p.id} className="relative grid w-[92%] shrink-0 snap-center grid-cols-[1.1fr_1fr] overflow-hidden rounded-[1.5rem] bg-olive-soft text-paper-foreground shadow-lift md:w-[640px]">
+              <div className="relative z-10 bg-paper p-4 pr-2 md:p-6">
+                <span className="absolute -right-10 -top-[10%] h-[120%] w-20 rounded-[50%] bg-paper" />
+                <div className="relative">
+                  <p className="font-brand text-[7px] tracking-[0.35em] md:text-[9px]">ORRION / CURATED FINDS</p>
+                  <h3 className="mt-2 font-display text-[1.05rem] font-semibold leading-[1.05] md:text-2xl">{l1}{rest.length ? <><br />{rest.join(" ")}</> : null}</h3>
+                  <p className="mt-1 truncate text-[10px] text-paper-muted md:text-sm">{p.name}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <span className="text-sm font-bold tabular-nums md:text-lg">{inr(p.price)}</span>
+                    <span className="text-[10px] text-paper-muted line-through">{inr(p.compare_at!)}</span>
+                    <span className="rounded-full bg-primary px-1.5 py-0.5 text-[8px] font-semibold text-primary-foreground">{percentOff(p.price, p.compare_at)}% OFF</span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button onClick={() => add.mutate({ product: p, color, quantity: 1 }, { onSuccess: () => navigate({ to: "/cart" }) })}
+                      disabled={add.isPending}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-full bg-ink px-3.5 text-[10px] font-semibold text-paper disabled:opacity-50">
+                      Buy Now <ArrowUpRight className="size-3.5" />
+                    </button>
+                    <button onClick={() => add.mutate({ product: p, color, quantity: 1 })} aria-label={`Add ${p.name} to cart`}
+                      className="grid size-8 place-items-center rounded-full bg-olive-soft text-paper"><Plus className="size-4" /></button>
+                  </div>
+                </div>
+              </div>
+              <Link to="/product/$slug" params={{ slug: p.slug }} className="relative block">
+                <img src={productImage(p.image)} alt={p.name} loading="lazy" width={300} height={300}
+                  className="absolute left-1/2 top-1/2 size-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full object-cover shadow-lift" />
+                <span className="absolute left-[8%] top-[22%] h-[56%] w-[90%] -rotate-12 rounded-[50%] border border-paper/30" />
+                <span className="absolute bottom-3 right-3 text-right font-brand text-[6px] leading-relaxed tracking-[0.3em] text-paper/80">ORRION<br />SPOTLIGHT</span>
+              </Link>
+              <button onClick={() => wl.toggle(p)} aria-label={saved ? "Remove from wishlist" : "Add to wishlist"} aria-pressed={saved}
+                className="absolute right-2.5 top-2.5 z-10 grid size-7 place-items-center text-paper">
+                <Heart className={saved ? "size-4 fill-primary text-primary" : "size-4"} />
+              </button>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }
