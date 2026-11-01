@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, ArrowRight } from "lucide-react";
 import { AppHeader } from "@/components/olyon/chrome";
 import { ProductCard, ProductGridSkeleton } from "@/components/olyon/product-card";
+import { ForestPageHeader } from "@/components/olyon/decor";
 import { EmptyState, PageTitle, btn } from "@/components/olyon/ui";
 import { useWishlist } from "@/lib/shop";
 
@@ -22,7 +23,7 @@ function Wishlist() {
   return (
     <div>
       <AppHeader />
-      <PageTitle title="Wishlist" sub={`${data?.length ?? 0} saved products`} />
+      <ForestPageHeader code="Saved nest" title="Wishlist" sub={`${data?.length ?? 0} saved products`} />
       {!isLoading && !data?.length ? (
         <EmptyState icon={<Heart className="size-7" />} title="Nothing saved yet" text="Tap the heart on any product to keep it here."
           action={<Link to="/shop" className={btn()}>Discover products <ArrowRight className="size-4" /></Link>} />

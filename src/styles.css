@@ -268,7 +268,7 @@
   72%, 78% { transform: rotate(-20deg); }
   80%, 100% { transform: rotate(0deg); }
 }
-@utility magpie-head { transform-origin: 70% 31%; animation: magpie-head 3.2s steps(1, end) infinite, none; animation-timing-function: cubic-bezier(.7,0,.3,1); }
+@utility magpie-head { transform-origin: 70% 31%; animation: magpie-head 3.2s cubic-bezier(.7,0,.3,1) infinite; }
 @keyframes magpie-bob { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-1.2%) scaleY(1.01); } }
 @utility magpie-bob { animation: magpie-bob 2.4s ease-in-out infinite; transform-origin: 60% 75%; }
 @keyframes feather-float { 0%, 100% { transform: translateY(0) rotate(-12deg); } 50% { transform: translateY(-18px) rotate(6deg); } }
