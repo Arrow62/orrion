@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { AppHeader } from "@/components/olyon/chrome";
 import { AddressForm } from "@/components/olyon/address-form";
+import { ForestPageHeader } from "@/components/olyon/decor";
 import { Btn, PageTitle, Skel } from "@/components/olyon/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -81,7 +82,7 @@ function Checkout() {
   return (
     <div>
       <AppHeader back />
-      <PageTitle title="Checkout" sub="Complete your order in just a few steps" />
+      <ForestPageHeader code="Secure checkout · COD" title="Checkout" sub="Complete your order in just a few steps" />
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
         <div className="space-y-4">
           <Section n={1} title="Shipping Address" sub="Where should we deliver your order?">

@@ -5,7 +5,8 @@ import { ChevronRight, Flame, Heart, Leaf, Lock, ArrowRight, ShoppingBag, Ticket
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppHeader, CartButton } from "@/components/olyon/chrome";
-import { Btn, EmptyState, PageTitle, Pill, QtyStepper, Skel, btn, iconBtn } from "@/components/olyon/ui";
+import { ForestPageHeader } from "@/components/olyon/decor";
+import { Btn, EmptyState, Pill, QtyStepper, Skel, btn, iconBtn } from "@/components/olyon/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { productImage } from "@/lib/images";
 import { computeTotals, inr, percentOff, type Coupon } from "@/lib/pricing";
@@ -52,8 +53,7 @@ function CartPage() {
   return (
     <div>
       <AppHeader right={<><Link to="/wishlist" className={iconBtn()} aria-label="Wishlist"><Heart className="size-5" /></Link><CartButton /></>} tagline="Viral products ✦ Better you" />
-      <PageTitle title="Your Cart" sub={`${count} item${count === 1 ? "" : "s"} in your cart`}
-        aside={<p className="hidden items-center gap-2 text-right text-sm text-olive sm:flex"><Leaf className="size-6" />Good things<br />are on the way</p>} />
+      <ForestPageHeader code="Cart module · live" title="Your Cart" sub={`${count} item${count === 1 ? "" : "s"} · Good things are on the way`} />
 
       {isLoading ? (
         <div className="space-y-3">{[0, 1].map((i) => <Skel key={i} className="h-40" />)}</div>

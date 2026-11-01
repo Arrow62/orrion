@@ -9,6 +9,8 @@ import { Btn, Field, btn } from "@/components/olyon/ui";
 import { Logo } from "@/components/olyon/chrome";
 import { useAuth } from "@/lib/auth";
 import forestMist from "@/assets/forest-mist.jpg";
+import leaves from "@/assets/tech-leaves.png";
+import { AnimatedMagpie } from "@/components/olyon/magpie";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: z.object({ mode: z.enum(["login", "signup"]).optional(), redirect: z.string().optional() }),
@@ -129,8 +131,18 @@ function AuthPage() {
           <Link to="/auth" search={{ mode: "login", redirect }} className={btn({ variant: "outline", className: "mt-8" })} onClick={() => setSent(false)}>Back to log in</Link>
         </div>
       ) : (
-        <form onSubmit={submit} className="relative pb-40 pt-8" noValidate>
-          <h1 className="text-[2.6rem] leading-tight">{mode === "signup" ? "Create Account" : "Welcome Back"}</h1>
+        <form onSubmit={submit} className="relative pb-40 pt-4" noValidate>
+          <div className="relative -mx-2 mb-4 h-44">
+            <img src={leaves} alt="" width={1024} height={1024} className="animate-sway absolute -left-6 top-0 w-44 opacity-50" />
+            <div className="animate-orbit absolute right-6 top-2 size-40 rounded-full border border-dashed border-primary/30" />
+            <div className="absolute right-10 top-6 size-32 rounded-full bg-olive/15 blur-2xl" />
+            <AnimatedMagpie eager className="absolute right-0 top-0 w-48" />
+            <p className="absolute bottom-2 left-2 font-mono-ui text-[10px] uppercase tracking-[0.25em] text-olive">
+              <span className="mr-2 inline-block size-1.5 animate-pulse rounded-full bg-primary align-middle" />{mode === "signup" ? "New member · nest 01" : "Access portal · secure"}
+            </p>
+          </div>
+          <div className="hud-glass corners relative rounded-[1.75rem] p-5">
+          <h1 className="text-[1.9rem] leading-tight">{mode === "signup" ? "Create Account" : "Welcome Back"}</h1>
           <p className="mt-2 text-muted-foreground">
             {mode === "signup" ? "Join Orrion for early access to viral products, deals and more." : "Log in to continue your journey with Orrion."}
           </p>
@@ -181,6 +193,7 @@ function AuthPage() {
               {mode === "signup" ? "Log In" : "Sign Up"}
             </Link>
           </p>
+          </div>
         </form>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { AnimatedMagpie } from "@/components/olyon/magpie";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -29,11 +30,17 @@ function Success() {
   return (
     <div className="mx-auto max-w-lg py-6 text-center">
       <Logo />
-      <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 14 }}
-        className="mx-auto mt-10 grid size-24 place-items-center rounded-full bg-olive text-olive-foreground shadow-lift">
-        <Check className="size-12" strokeWidth={2.5} />
-      </motion.div>
-      <h1 className="mt-6 text-4xl">Order Successful!</h1>
+      <div className="relative mx-auto mt-6 w-56">
+        <div className="animate-orbit absolute inset-4 rounded-full border border-dashed border-primary/40" />
+        <div className="absolute inset-10 rounded-full bg-olive/20 blur-2xl" />
+        <AnimatedMagpie eager className="relative w-full" />
+        <motion.div initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 220, damping: 13, delay: 0.3 }}
+          className="absolute bottom-6 left-4 grid size-14 place-items-center rounded-full bg-olive text-olive-foreground shadow-glow">
+          <Check className="size-7" strokeWidth={2.5} />
+        </motion.div>
+      </div>
+      <p className="mt-4 font-mono-ui text-[10px] uppercase tracking-[0.25em] text-olive">Transmission received</p>
+      <h1 className="mt-2 text-3xl">Order Successful!</h1>
       <p className="mt-2 text-muted-foreground">Pay in cash when your order arrives.</p>
       {!data ? <Skel className="mt-6 h-60" /> : (
         <>

@@ -20,12 +20,14 @@ export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
 
   return (
     <article ref={ref} data-reveal className="group relative [transform-style:preserve-3d]">
-      <div className="relative overflow-hidden rounded-[1.4rem] border border-border bg-surface shadow-soft">
+      <div className="relative overflow-hidden rounded-[1.4rem] border border-border bg-surface shadow-soft transition-[border-color,box-shadow] duration-500 group-hover:border-olive/50 group-hover:shadow-glow">
+        <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-olive to-transparent opacity-60" />
         <Link to="/product/$slug" params={{ slug: p.slug }} className="block">
           <div className="corners relative aspect-[4/5] overflow-hidden bg-forest">
             <img src={productImage(p.image)} alt={p.name} loading="lazy" width={400} height={500}
               className="size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-transparent to-forest/30" />
+            <span className="animate-scan-y pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-olive/0 via-olive/15 to-olive/0 opacity-0 group-hover:opacity-100" />
             <span className="shine pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100" />
             <span className="absolute left-3 top-3 font-mono-ui text-[9px] uppercase text-foreground/70">{code}</span>
             {off ? (
@@ -35,8 +37,9 @@ export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
               <span className="absolute inset-0 grid place-items-center bg-background/60 font-mono-ui text-[10px] uppercase backdrop-blur-[2px]">Sold out</span>
             ) : null}
           </div>
-          <div className="px-3 pb-3 pt-2.5">
-            <h3 className="truncate font-sans text-[0.8rem] font-medium tracking-tight text-foreground/90">{p.name}</h3>
+          <div className="relative px-3 pb-3 pt-2.5">
+            <span className="absolute right-3 top-3 font-mono-ui text-[8px] uppercase text-olive">{p.stock > 0 ? "● in stock" : "○ out"}</span>
+            <h3 className="truncate pr-14 font-sans text-[0.8rem] font-medium tracking-tight text-foreground/90">{p.name}</h3>
             <div className="mt-1 flex items-center gap-1.5">
               {colorsOf(p).slice(0, 3).map((c) => (
                 <span key={c.name} className="size-2 rounded-full ring-1 ring-border" style={{ backgroundColor: c.hex }} />

@@ -19,6 +19,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/auth";
 import { BottomNav } from "@/components/olyon/chrome";
 import { Splash } from "@/components/olyon/splash";
+import { ForestBackdrop } from "@/components/olyon/decor";
 
 function NotFoundComponent() {
   return (
@@ -116,11 +117,34 @@ function RootComponent() {
   const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   usePageMotion(mainRef, pathname);
+  useEffect(() => {
+    // A stale cached file after an app update makes a page chunk fail to load.
+    // Reload once to fetch fresh files instead of leaving a blank screen.
+    const onFail = (e: Event) => {
+      if (sessionStorage.getItem("orrion-reloaded")) return;
+      sessionStorage.setItem("orrion-reloaded", "1");
+      e.preventDefault();
+      window.location.reload();
+    };
+    const onRejection = (e: PromiseRejectionEvent) => {
+      const msg = String((e.reason as Error)?.message ?? e.reason ?? "");
+      if (/module script|dynamically imported module|Failed to fetch/i.test(msg)) onFail(e);
+    };
+    window.addEventListener("vite:preloadError", onFail);
+    window.addEventListener("unhandledrejection", onRejection);
+    const clear = setTimeout(() => sessionStorage.removeItem("orrion-reloaded"), 10000);
+    return () => {
+      window.removeEventListener("vite:preloadError", onFail);
+      window.removeEventListener("unhandledrejection", onRejection);
+      clearTimeout(clear);
+    };
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <MotionConfig reducedMotion="user">
           <Splash />
+          <ForestBackdrop />
           <main
             ref={mainRef}
             className="mx-auto min-h-screen w-full max-w-md px-4 pb-safe-nav md:max-w-3xl md:px-6 lg:max-w-6xl"

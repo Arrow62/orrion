@@ -8,6 +8,8 @@ import { ProductCard, ProductGridSkeleton } from "@/components/olyon/product-car
 import { SectionTitle, Skel } from "@/components/olyon/ui";
 import { BestSellers, DealOfDay, EditorialBanners, NewArrivals, TrustStrip } from "@/components/olyon/home-sections";
 import { HeroOrbit } from "@/components/olyon/hero";
+import { AnimatedMagpie } from "@/components/olyon/magpie";
+import leaves from "@/assets/tech-leaves.png";
 import { categoriesQuery, productsQuery } from "@/lib/shop";
 
 export const Route = createFileRoute("/")({
@@ -100,6 +102,22 @@ function Home() {
           <Link to="/shop" className="inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background active:scale-95">
             Start shopping <ArrowRight className="size-4" />
           </Link>
+        </div>
+      </section>
+
+      <section data-reveal className="hud-glass corners relative mt-10 overflow-hidden rounded-[2rem] p-5 md:p-8">
+        <div className="grid-lines absolute inset-0 opacity-40" />
+        <img src={leaves} alt="" width={1024} height={1024} loading="lazy" className="animate-sway pointer-events-none absolute -right-10 -top-12 w-48 opacity-40" />
+        <div className="relative grid grid-cols-[minmax(0,1fr)_8.5rem] items-center gap-3 md:grid-cols-[minmax(0,1fr)_14rem]">
+          <div>
+            <p className="font-mono-ui text-[10px] uppercase tracking-[0.25em] text-olive"><span className="mr-2 inline-block size-1.5 animate-pulse rounded-full bg-primary align-middle" />Magpie radar</p>
+            <h2 className="mt-2 text-xl md:text-3xl">Shiny finds, spotted first</h2>
+            <p className="mt-1.5 text-[0.78rem] text-muted-foreground">Our magpie scouts the internet for what's going viral — before everyone else.</p>
+            <Link to="/shop" search={{ trending: true }} className="mt-4 inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-[0.8rem] font-semibold text-primary-foreground active:scale-95">
+              See the radar <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          <AnimatedMagpie className="w-full" />
         </div>
       </section>
 
