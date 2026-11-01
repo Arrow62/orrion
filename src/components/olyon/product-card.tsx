@@ -27,7 +27,7 @@ export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
             <img src={productImage(p.image)} alt={p.name} loading="lazy" width={400} height={500}
               className="size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" />
             <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-transparent to-forest/30" />
-            <span className="animate-scan pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-olive/0 via-olive/15 to-olive/0 opacity-0 group-hover:opacity-100" />
+            <span className="animate-scan-y pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-olive/0 via-olive/15 to-olive/0 opacity-0 group-hover:opacity-100" />
             <span className="shine pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100" />
             <span className="absolute left-3 top-3 font-mono-ui text-[9px] uppercase text-foreground/70">{code}</span>
             {off ? (

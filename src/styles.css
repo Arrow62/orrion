@@ -277,3 +277,6 @@
   .magpie-bob, .feather-float { animation: none; }
   .magpie-head { animation-duration: 6s; }
 }
+
+@keyframes scan-y { 0% { transform: translateY(-100%); } 100% { transform: translateY(320%); } }
+@utility animate-scan-y { animation: scan-y 2.6s linear infinite; }
