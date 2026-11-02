@@ -58,6 +58,7 @@ function Profile() {
       </div>
       <div className="surface mt-4 divide-y divide-border rounded-3xl">
         {[
+          { to: "/orders" as const, icon: Package, t: "My Orders", s: "Past purchases and delivery status" },
           { to: "/cart" as const, icon: ShoppingBag, t: "My Cart", s: "Items waiting for checkout" },
           { to: "/wishlist" as const, icon: Heart, t: "Wishlist", s: "Your saved products" },
           { to: "/shop" as const, icon: Package, t: "Continue shopping", s: "Browse the full catalogue" },

@@ -1,66 +1,73 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Plus } from "lucide-react";
+import { Heart, ShoppingBag, Star } from "lucide-react";
 import { useRef } from "react";
 import { productImage } from "@/lib/images";
 import { inr, percentOff } from "@/lib/pricing";
 import { colorsOf, useAddToCart, useToggleWishlist, type Product } from "@/lib/shop";
-import { gsap, useTilt } from "@/lib/gsap";
+import { gsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 import { Skel } from "./ui";
 
-export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
+export function ProductCard({ p }: { p: Product; index?: number }) {
   const wl = useToggleWishlist();
   const add = useAddToCart();
-  const ref = useRef<HTMLElement>(null);
   const heart = useRef<HTMLButtonElement>(null);
-  useTilt(ref, 7);
   const saved = wl.has(p.id);
   const off = percentOff(p.price, p.compare_at);
-  const code = `OR-${String(index + 1).padStart(2, "0")}`;
+  const colors = colorsOf(p);
+  const soldOut = p.stock === 0;
+  const low = p.stock > 0 && p.stock <= 5;
 
   return (
-    <article ref={ref} data-reveal className="group relative [transform-style:preserve-3d]">
-      <div className="relative overflow-hidden rounded-[1.4rem] border border-border bg-surface shadow-soft transition-[border-color,box-shadow] duration-500 group-hover:border-olive/50 group-hover:shadow-glow">
-        <span className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-olive to-transparent opacity-60" />
-        <Link to="/product/$slug" params={{ slug: p.slug }} className="block">
-          <div className="corners relative aspect-[4/5] overflow-hidden bg-forest">
-            <img src={productImage(p.image)} alt={p.name} loading="lazy" width={400} height={500}
-              className="size-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest/90 via-transparent to-forest/30" />
-            <span className="animate-scan-y pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-olive/0 via-olive/15 to-olive/0 opacity-0 group-hover:opacity-100" />
-            <span className="shine pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100" />
-            <span className="absolute left-3 top-3 font-mono-ui text-[9px] uppercase text-foreground/70">{code}</span>
-            {off ? (
-              <span className="absolute bottom-3 left-3 rounded-full bg-primary px-2 py-0.5 font-mono-ui text-[9px] font-semibold text-primary-foreground">−{off}%</span>
-            ) : null}
-            {p.stock === 0 ? (
-              <span className="absolute inset-0 grid place-items-center bg-background/60 font-mono-ui text-[10px] uppercase backdrop-blur-[2px]">Sold out</span>
+    <article data-reveal className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-olive/40 hover:shadow-lift">
+      <Link to="/product/$slug" params={{ slug: p.slug }} className="flex flex-1 flex-col">
+        <div className="relative aspect-square overflow-hidden bg-secondary">
+          <img src={productImage(p.image)} alt={p.name} loading="lazy" width={400} height={400}
+            className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+            {off ? <span className="rounded-md bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">{off}% OFF</span> : null}
+            {p.badge ? <span className="rounded-md bg-background/75 px-1.5 py-0.5 text-[10px] font-medium backdrop-blur">{p.badge}</span> : null}
+          </div>
+          {soldOut ? (
+            <span className="absolute inset-0 grid place-items-center bg-background/60 text-xs font-semibold uppercase tracking-wider backdrop-blur-[2px]">Sold out</span>
+          ) : null}
+        </div>
+        <div className="flex flex-1 flex-col p-3">
+          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <Star className="size-3 fill-olive text-olive" />
+            <span className="font-semibold text-foreground">{Number(p.rating).toFixed(1)}</span>
+            <span>({p.reviews})</span>
+            {colors.length > 1 ? (
+              <span className="ml-auto flex -space-x-1">
+                {colors.slice(0, 3).map((c) => (
+                  <span key={c.name} className="size-2.5 rounded-full ring-1 ring-surface" style={{ backgroundColor: c.hex }} />
+                ))}
+              </span>
             ) : null}
           </div>
-          <div className="relative px-3 pb-3 pt-2.5">
-            <span className="absolute right-3 top-3 font-mono-ui text-[8px] uppercase text-olive">{p.stock > 0 ? "● in stock" : "○ out"}</span>
-            <h3 className="truncate pr-14 font-sans text-[0.8rem] font-medium tracking-tight text-foreground/90">{p.name}</h3>
-            <div className="mt-1 flex items-center gap-1.5">
-              {colorsOf(p).slice(0, 3).map((c) => (
-                <span key={c.name} className="size-2 rounded-full ring-1 ring-border" style={{ backgroundColor: c.hex }} />
-              ))}
-            </div>
-            <div className="mt-1.5 flex items-baseline gap-1.5 pr-9">
-              <span className="text-[0.92rem] font-semibold tabular-nums">{inr(p.price)}</span>
+          <h3 className="mt-1 line-clamp-2 min-h-[2.4em] text-[0.82rem] font-medium leading-[1.2] text-foreground">{p.name}</h3>
+          <div className="mt-auto pt-2">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[0.95rem] font-bold tabular-nums">{inr(p.price)}</span>
               {p.compare_at ? <span className="text-[10px] text-muted-foreground line-through">{inr(p.compare_at)}</span> : null}
             </div>
+            <p className={cn("mt-0.5 text-[10px]", low ? "text-primary" : "text-muted-foreground")}>
+              {soldOut ? "Currently unavailable" : low ? `Only ${p.stock} left` : "Free delivery over ₹999"}
+            </p>
           </div>
-        </Link>
+        </div>
+      </Link>
+      <div className="px-3 pb-3">
         <button
-          disabled={p.stock === 0 || add.isPending}
+          disabled={soldOut || add.isPending}
           onClick={(e) => {
-            gsap.fromTo(e.currentTarget, { rotate: 0, scale: 0.8 }, { rotate: 90, scale: 1, duration: 0.5, ease: "back.out(3)" });
-            add.mutate({ product: p, color: colorsOf(p)[0]?.name ?? "", quantity: 1 });
+            gsap.fromTo(e.currentTarget, { scale: 0.94 }, { scale: 1, duration: 0.4, ease: "back.out(3)" });
+            add.mutate({ product: p, color: colors[0]?.name ?? "", quantity: 1 });
           }}
           aria-label={`Add ${p.name} to cart`}
-          className="absolute bottom-2.5 right-2.5 grid size-8 place-items-center rounded-full bg-olive text-olive-foreground transition hover:brightness-110 disabled:opacity-40"
+          className="flex h-9 w-full items-center justify-center gap-1.5 rounded-xl border border-olive/40 text-[0.75rem] font-semibold text-olive transition hover:bg-olive hover:text-olive-foreground disabled:opacity-40"
         >
-          <Plus className="size-4" />
+          <ShoppingBag className="size-3.5" /> Add to cart
         </button>
       </div>
       <button
@@ -71,9 +78,9 @@ export function ProductCard({ p, index = 0 }: { p: Product; index?: number }) {
         }}
         aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
         aria-pressed={saved}
-        className="absolute right-2.5 top-2.5 grid size-7 place-items-center rounded-full bg-background/40 backdrop-blur-md"
+        className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-background/60 backdrop-blur-md"
       >
-        <Heart className={cn("size-[14px] transition-colors", saved ? "fill-primary text-primary" : "text-foreground")} />
+        <Heart className={cn("size-4 transition-colors", saved ? "fill-primary text-primary" : "text-foreground")} />
       </button>
     </article>
   );
@@ -83,9 +90,9 @@ export function ProductGridSkeleton({ n = 4 }: { n?: number }) {
   return (
     <>
       {Array.from({ length: n }).map((_, i) => (
-        <div key={i} className="overflow-hidden rounded-[1.4rem] border border-border bg-surface">
-          <Skel className="aspect-[4/5] rounded-none" />
-          <div className="space-y-2 p-3"><Skel className="h-3 w-3/4" /><Skel className="h-3 w-1/2" /></div>
+        <div key={i} className="overflow-hidden rounded-2xl border border-border bg-surface">
+          <Skel className="aspect-square rounded-none" />
+          <div className="space-y-2 p-3"><Skel className="h-3 w-3/4" /><Skel className="h-3 w-1/2" /><Skel className="h-8 w-full" /></div>
         </div>
       ))}
     </>
