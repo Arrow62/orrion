@@ -278,5 +278,28 @@
   .magpie-head { animation-duration: 6s; }
 }
 
+/* ---------- Living magpie inside the illustration ---------- */
+@keyframes bird-head-live {
+  0%, 10% { transform: rotate(0deg); }
+  13%, 28% { transform: rotate(-14deg) translateY(-0.3%); }
+  31%, 40% { transform: rotate(9deg); }
+  42%, 46% { transform: rotate(2deg) translateX(0.4%); }
+  49%, 64% { transform: rotate(16deg) translateY(0.4%); }
+  67%, 72% { transform: rotate(-8deg); }
+  75%, 100% { transform: rotate(0deg); }
+}
+@utility bird-head-live { transform-origin: 39% 41%; animation: bird-head-live 3.4s cubic-bezier(.7,0,.3,1) infinite; }
+@keyframes bird-body { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-0.25%) scaleY(1.004); } }
+@utility bird-body { transform-origin: 30% 60%; animation: bird-body 2.6s ease-in-out infinite; }
+@keyframes scene-drift { 0%, 100% { transform: scale(1.02) translateX(0); } 50% { transform: scale(1.05) translateX(-1%); } }
+@utility scene-drift { animation: scene-drift 18s ease-in-out infinite; }
+@keyframes mist-drift { 0%, 100% { transform: translateX(-8%); opacity: .7; } 50% { transform: translateX(8%); opacity: 1; } }
+@utility mist-drift { animation: mist-drift 12s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .bird-body, .scene-drift, .mist-drift { animation: none; }
+  .bird-head-live { animation-duration: 7s; }
+}
+
+
 @keyframes scan-y { 0% { transform: translateY(-100%); } 100% { transform: translateY(320%); } }
 @utility animate-scan-y { animation: scan-y 2.6s linear infinite; }
