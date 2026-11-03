@@ -16,7 +16,7 @@ export function usePageMotion(ref: RefObject<HTMLElement | null>, key: string) {
     const el = ref.current;
     if (!el || reduced()) return;
     const ctx = gsap.context(() => {
-      gsap.fromTo(el, { autoAlpha: 0, y: 14, filter: "blur(6px)" }, { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 0.6, ease: "expo.out", clearProps: "filter,transform" });
+      gsap.fromTo(el, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out", clearProps: "transform" });
       // reveal targets appear in DOM lazily (queries), so observe mutations
       const seen = new WeakSet<Element>();
       const scan = () => {
