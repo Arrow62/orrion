@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-router";
 import { MotionConfig } from "framer-motion";
 import { Toaster } from "sonner";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";

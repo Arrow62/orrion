@@ -1,5 +1,4 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
-import { motion } from "framer-motion";
 import { ArrowLeft, Heart, Home, LayoutGrid, Menu, Search, ShoppingBag, User } from "lucide-react";
 import { useRef, type ReactNode } from "react";
 import { gsap, useIsoLayoutEffect } from "@/lib/gsap";
@@ -107,8 +106,8 @@ export function BottomNav() {
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),0.6rem)]" aria-label="Main">
       <div className="surface relative mx-auto flex max-w-sm items-end rounded-[1.6rem] px-1.5 pb-0.5 pt-1 backdrop-blur-xl">
-        <Tab t={tabs[0]} />
-        <Tab t={tabs[1]} />
+        <Tab {...tabProps(0)} />
+        <Tab {...tabProps(1)} />
         <div className="flex flex-1 justify-center">
           <Link to="/cart" aria-label={`Cart, ${count} items`}
             className="relative -mt-6 grid size-12 place-items-center rounded-full bg-plum-gradient text-primary-foreground shadow-glow ring-4 ring-background transition-transform active:scale-90">
@@ -116,8 +115,8 @@ export function BottomNav() {
             <Badge count={count} />
           </Link>
         </div>
-        <Tab t={tabs[2]} />
-        <Tab t={tabs[3]} />
+        <Tab {...tabProps(2)} />
+        <Tab {...tabProps(3)} />
       </div>
     </nav>
   );
