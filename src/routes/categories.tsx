@@ -55,7 +55,7 @@ function Categories() {
                     <div className="min-w-0">
                       <h2 className={cn("truncate font-semibold", big ? "text-xl" : "text-[0.95rem]")}>{c.name}</h2>
                       <p className="text-[11px] text-muted-foreground">
-                        {items.length} products{from !== null ? ` · from ${inr(from)}` : ""}
+                        {items.length} product{items.length === 1 ? "" : "s"}{from !== null ? ` · from ${inr(from)}` : ""}
                       </p>
                       {big && items.length > 1 ? (
                         <div className="mt-2 flex -space-x-2">
