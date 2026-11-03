@@ -1,18 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Banknote, Lock, Plus, Rocket, Truck } from "lucide-react";
+import { ArrowRight, Banknote, Building2, ChevronDown, CreditCard, Home, Lock, MapPin, Pencil, Plus, ShoppingBag, Smartphone, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { AppHeader } from "@/components/olyon/chrome";
 import { AddressForm } from "@/components/olyon/address-form";
-import { ForestPageHeader } from "@/components/olyon/decor";
-import { Btn, PageTitle, Skel } from "@/components/olyon/ui";
+import { NightCta, NightFooter, NightHero } from "@/components/olyon/night";
+import { Skel } from "@/components/olyon/ui";
+import house from "@/assets/forest-house.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { productImage } from "@/lib/images";
-import { computeTotals, inr, type Delivery } from "@/lib/pricing";
-import { useCart } from "@/lib/shop";
+import { computeTotals, inr } from "@/lib/pricing";
+import { useCart, useUpdateCartQty } from "@/lib/shop";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/checkout")({
@@ -28,16 +28,24 @@ export const Route = createFileRoute("/_authenticated/checkout")({
   component: Checkout,
 });
 
+const methods = [
+  { id: "cod", label: "Cash on Delivery", icon: Banknote, live: true },
+  { id: "card", label: "Credit / Debit Card", icon: CreditCard, live: false },
+  { id: "upi", label: "UPI", icon: Smartphone, live: false },
+  { id: "net", label: "Net Banking", icon: Building2, live: false },
+] as const;
+
 function Checkout() {
   const { coupon: code } = Route.useSearch();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const cart = useCart();
+  const update = useUpdateCartQty();
   const key = useRef(crypto.randomUUID());
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [delivery, setDelivery] = useState<Delivery>("standard");
   const [busy, setBusy] = useState(false);
 
   const addresses = useQuery({
@@ -54,104 +62,167 @@ function Checkout() {
   }, [addresses.data, addressId]);
 
   const items = cart.data ?? [];
-  const t = computeTotals(items.map((i) => ({ price: i.product.price, compare_at: i.product.compare_at, quantity: i.quantity })), delivery, coupon.data);
+  const t = computeTotals(items.map((i) => ({ price: i.product.price, compare_at: i.product.compare_at, quantity: i.quantity })), "standard", coupon.data);
+  const selected = addresses.data?.find((a) => a.id === addressId);
+  const count = items.reduce((s, i) => s + i.quantity, 0);
 
   const place = async () => {
-    if (!addressId) { toast.error("Add a shipping address first"); return; }
+    if (!addressId) { toast.error("Add a delivery address first"); return; }
     setBusy(true);
     const { data, error } = await supabase.rpc("place_order", {
-      _address_id: addressId, _delivery: delivery, _coupon: code ?? "", _idempotency_key: key.current,
+      _address_id: addressId, _delivery: "standard", _coupon: code ?? "", _idempotency_key: key.current,
     });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["cart"] });
     qc.invalidateQueries({ queryKey: ["products"] });
-    const row = data?.[0];
-    navigate({ to: "/order-success/$id", params: { id: row!.order_id }, replace: true });
+    navigate({ to: "/order-success/$id", params: { id: data![0]!.order_id }, replace: true });
   };
 
-  if (cart.isLoading) return <div><AppHeader back /><Skel className="h-80" /></div>;
+  const hero = (
+    <NightHero back cart={false} eyebrow="Checkout" title={<>Complete Your <em className="text-lime">Order</em></>} sub="Review your details and place your order">
+      <svg viewBox="0 0 220 30" className="mt-3 w-52 text-lime" aria-hidden>
+        <path d="M2 10 C60 30 140 30 200 18" stroke="currentColor" strokeWidth="1" fill="none" opacity=".7" />
+        <path d="M200 18 C206 8 216 6 218 4 C216 14 210 20 200 18Z" fill="var(--olive)" />
+      </svg>
+    </NightHero>
+  );
+
+  if (cart.isLoading) return <div>{hero}<Skel className="h-80" /></div>;
   if (!items.length) {
     return (
-      <div><AppHeader back />
-        <p className="py-20 text-center text-muted-foreground">Your cart is empty. <Link to="/shop" className="font-semibold text-olive">Shop now</Link></p>
+      <div>{hero}
+        <p className="py-16 text-center text-muted-foreground">Your cart is empty. <Link to="/shop" className="font-semibold text-lime">Shop now</Link></p>
+        <NightFooter />
       </div>
     );
   }
 
   return (
     <div>
-      <AppHeader back />
-      <ForestPageHeader code="Secure checkout · COD" title="Checkout" sub="Complete your order in just a few steps" />
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
-        <div className="space-y-4">
-          <Section n={1} title="Shipping Address" sub="Where should we deliver your order?">
-            <div className="space-y-2.5">
-              {(addresses.data ?? []).map((a) => (
-                <label key={a.id} className={cn("flex cursor-pointer gap-3 rounded-2xl border p-4", addressId === a.id ? "border-olive bg-olive-soft" : "border-border")}>
-                  <input type="radio" name="addr" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1 accent-[var(--olive)]" />
-                  <span className="text-sm"><strong className="block">{a.full_name} · {a.phone}</strong>{a.line1}, {a.city}, {a.state} – {a.pincode}</span>
-                </label>
-              ))}
-              {adding || !addresses.data?.length ? (
-                <AddressForm onDone={(a) => { setAddressId(a.id); setAdding(false); }} onCancel={addresses.data?.length ? () => setAdding(false) : undefined} />
-              ) : (
-                <button onClick={() => setAdding(true)} className="flex items-center gap-2 text-sm font-semibold text-olive"><Plus className="size-4" /> Add new address</button>
-              )}
+      {hero}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-10">
+        <div>
+          {/* Delivery address */}
+          <section className="relative overflow-hidden border-b border-foreground/10 pb-6">
+            <img src={house} alt="" width={944} height={704} loading="lazy" aria-hidden
+              className="pointer-events-none absolute -right-6 top-6 w-[46%] max-w-xs [mask-image:radial-gradient(closest-side,black_65%,transparent)]" />
+            <div className="relative flex items-center justify-between">
+              <h2 className="flex items-center gap-4 font-display text-2xl">
+                <span className="grid size-11 place-items-center rounded-full bg-olive-soft text-lime"><MapPin className="size-5" /></span>
+                Delivery Address
+              </h2>
+              {addresses.data?.length ? (
+                <button onClick={() => setEditing((e) => !e)} className="flex items-center gap-2 text-sm">{editing ? "Done" : "Edit"} <Pencil className="size-4" /></button>
+              ) : null}
             </div>
-          </Section>
-          <Section n={2} title="Delivery Option" sub="Choose how you want your order delivered">
-            {([
-              { v: "standard", i: Truck, t: "Standard Delivery", s: "5–7 business days", p: t.subtotal >= 999 ? "FREE" : inr(49) },
-              { v: "express", i: Rocket, t: "Express Delivery", s: "2–3 business days", p: inr(99) },
-            ] as const).map((o) => (
-              <label key={o.v} className={cn("mb-2.5 flex cursor-pointer items-center gap-3 rounded-2xl border p-4", delivery === o.v ? "border-olive bg-olive-soft" : "border-border")}>
-                <input type="radio" name="del" checked={delivery === o.v} onChange={() => setDelivery(o.v)} className="accent-[var(--olive)]" />
-                <o.i className="size-5" />
-                <span className="flex-1 text-sm"><strong className="block">{o.t}</strong><span className="text-muted-foreground">{o.s}</span></span>
-                <span className="text-sm font-semibold">{o.p}</span>
-              </label>
-            ))}
-          </Section>
-          <Section n={3} title="Payment Method" sub="Online payments are coming soon">
-            <label className="flex items-center gap-3 rounded-2xl border border-olive bg-olive-soft p-4">
-              <input type="radio" checked readOnly className="accent-[var(--olive)]" />
-              <Banknote className="size-5" /><span className="text-sm font-semibold">Cash on Delivery</span>
-            </label>
-          </Section>
+            <div className="relative mt-5 max-w-[58%]">
+              {addresses.isLoading ? <Skel className="h-20" /> : selected && !editing ? (
+                <>
+                  <p className="text-lg font-semibold">{selected.full_name}</p>
+                  <p className="mt-1 text-[0.9rem] text-foreground/85">{selected.line1}, {selected.city}, {selected.state} - {selected.pincode}</p>
+                  <span className="mt-3 inline-flex h-9 items-center gap-2 rounded-full border border-olive bg-olive-soft/60 px-4 text-sm"><Home className="size-4" /> {selected.phone}</span>
+                </>
+              ) : null}
+            </div>
+            {editing || !addresses.data?.length ? (
+              <div className="relative mt-4 space-y-2.5">
+                {(addresses.data ?? []).map((a) => (
+                  <label key={a.id} className={cn("flex cursor-pointer gap-3 rounded-2xl border bg-background/80 p-4 backdrop-blur", addressId === a.id ? "border-lime" : "border-foreground/15")}>
+                    <input type="radio" name="addr" checked={addressId === a.id} onChange={() => setAddressId(a.id)} className="mt-1 accent-[var(--olive)]" />
+                    <span className="text-sm"><strong className="block">{a.full_name} · {a.phone}</strong>{a.line1}, {a.city}, {a.state} – {a.pincode}</span>
+                  </label>
+                ))}
+                {adding || !addresses.data?.length ? (
+                  <div className="rounded-2xl bg-background/90 p-1 backdrop-blur">
+                    <AddressForm onDone={(a) => { setAddressId(a.id); setAdding(false); setEditing(false); }} onCancel={addresses.data?.length ? () => setAdding(false) : undefined} />
+                  </div>
+                ) : (
+                  <button onClick={() => setAdding(true)} className="flex items-center gap-2 text-sm font-semibold text-lime"><Plus className="size-4" /> Add new address</button>
+                )}
+              </div>
+            ) : null}
+          </section>
+
+          {/* Order items */}
+          <section className="border-b border-foreground/10 py-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-4 font-display text-2xl"><ShoppingBag className="size-7" strokeWidth={1.4} /> Order Items</h2>
+              <span className="text-sm">{count} Item{count === 1 ? "" : "s"}</span>
+            </div>
+            <ul>
+              {items.map((i) => (
+                <li key={i.id} className="grid grid-cols-[6.5rem_minmax(0,1fr)_auto] items-center gap-4 border-b border-foreground/10 py-4 last:border-0 sm:grid-cols-[8rem_minmax(0,1fr)_auto]">
+                  <img src={productImage(i.product.image)} alt={i.product.name} width={240} height={200} loading="lazy" className="aspect-[6/5] w-full rounded-2xl object-cover" />
+                  <div className="min-w-0">
+                    <p className="truncate text-lg">{i.product.name}</p>
+                    <p className="truncate text-[0.8rem] text-foreground/60">{i.product.tagline}</p>
+                    <label className="relative mt-2 inline-flex h-8 items-center rounded-full border border-olive bg-olive-soft/50 pl-3 pr-7 text-sm">
+                      <span className="sr-only">Quantity</span>
+                      <select value={i.quantity} onChange={(e) => update.mutate({ id: i.id, quantity: Number(e.target.value) })}
+                        className="appearance-none bg-transparent outline-none">
+                        {Array.from({ length: Math.max(1, Math.min(i.product.stock, 10)) }, (_, n) => n + 1).map((n) => (
+                          <option key={n} value={n} className="bg-background">Qty: {n}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-2.5 size-3.5" />
+                    </label>
+                    <p className="mt-2 flex items-baseline gap-2">
+                      <span className="text-xl font-bold text-lime">{inr(i.product.price * i.quantity)}</span>
+                      {i.product.compare_at ? <span className="text-[0.8rem] text-foreground/50 line-through">{inr(i.product.compare_at * i.quantity)}</span> : null}
+                    </p>
+                  </div>
+                  <button onClick={() => update.mutate({ id: i.id, quantity: 0 })} aria-label={`Remove ${i.product.name}`}
+                    className="grid size-10 place-items-center rounded-full border border-foreground/25 hover:text-destructive">
+                    <Trash2 className="size-4" strokeWidth={1.6} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* Payment */}
+          <section className="border-b border-foreground/10 py-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-4 font-display text-2xl"><CreditCard className="size-7" strokeWidth={1.4} /> Payment Method</h2>
+              <span className="flex items-center gap-1.5 text-sm"><Lock className="size-4" /> 100% Secure</span>
+            </div>
+            <div className="grid grid-cols-4 items-stretch">
+              {methods.map((m, idx) => (
+                <button key={m.id} disabled={!m.live} aria-pressed={m.live}
+                  onClick={() => toast("Online payments are coming soon")}
+                  className={cn("relative flex flex-col items-center justify-center gap-1.5 px-1 py-3 text-center text-[0.72rem] leading-tight",
+                    m.live ? "rounded-2xl border-2 border-lime bg-olive-soft/60 text-foreground" : "text-foreground/45",
+                    idx > 1 && "border-l border-foreground/10")}>
+                  <m.icon className={cn("size-6", m.live ? "text-lime" : "")} strokeWidth={1.5} />
+                  {m.label}
+                  {!m.live ? <span className="text-[9px] uppercase tracking-wider text-foreground/40">Soon</span> : null}
+                </button>
+              ))}
+            </div>
+          </section>
         </div>
-        <aside className="surface mt-4 h-fit rounded-3xl p-5 lg:mt-0">
-          <h2 className="text-xl">Order Summary</h2>
-          <ul className="my-4 space-y-3">
-            {items.map((i) => (
-              <li key={i.id} className="flex items-center gap-3 text-sm">
-                <img src={productImage(i.product.image)} alt="" width={56} height={56} className="size-14 rounded-xl object-cover" />
-                <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{i.product.name}</span><span className="text-muted-foreground">{i.color} · Qty {i.quantity}</span></span>
-                <span>{inr(i.product.price * i.quantity)}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="space-y-2 border-t border-border pt-4 text-sm">
-            <div className="flex justify-between"><span>Subtotal</span><span>{inr(t.subtotal)}</span></div>
-            {t.discount ? <div className="flex justify-between text-success"><span>Coupon {code}</span><span>- {inr(t.discount)}</span></div> : null}
-            <div className="flex justify-between"><span>Shipping</span><span className={t.shipping ? "" : "text-success"}>{t.shipping ? inr(t.shipping) : "FREE"}</span></div>
-            <div className="flex justify-between border-t border-border pt-3 text-lg font-bold"><span>Total</span><span>{inr(t.total)}</span></div>
+
+        {/* Total + place order */}
+        <aside className="h-fit py-6 lg:sticky lg:top-6">
+          <div className="space-y-2 pb-4 text-sm">
+            <div className="flex justify-between"><span className="text-foreground/80">Subtotal</span><span>{inr(t.subtotal)}</span></div>
+            {t.discount ? <div className="flex justify-between text-lime"><span>Coupon {code}</span><span>- {inr(t.discount)}</span></div> : null}
+            <div className="flex justify-between"><span className="text-foreground/80">Shipping</span><span className={t.shipping ? "" : "text-lime"}>{t.shipping ? inr(t.shipping) : "FREE"}</span></div>
           </div>
-          <Btn size="lg" className="mt-5 w-full" loading={busy} onClick={place}><Lock className="size-4" /> Place Order (COD)</Btn>
+          <div className="grid grid-cols-[auto_1px_minmax(0,1fr)] items-center gap-5">
+            <div>
+              <p className="text-lg">Total Amount</p>
+              <p className="text-3xl font-bold text-lime">{inr(t.total)}</p>
+            </div>
+            <span className="h-14 bg-foreground/40" />
+            <NightCta onClick={place} disabled={busy} className="w-full font-sans text-lg">
+              {busy ? "Placing…" : "Place Order"} <ArrowRight className="size-5" />
+            </NightCta>
+          </div>
         </aside>
       </div>
+      <NightFooter />
     </div>
-  );
-}
-
-function Section({ n, title, sub, children }: { n: number; title: string; sub: string; children: React.ReactNode }) {
-  return (
-    <section className="surface rounded-3xl p-5">
-      <div className="mb-4 flex items-center gap-3">
-        <span className="grid size-9 place-items-center rounded-full bg-olive font-semibold text-olive-foreground">{n}</span>
-        <div><h2 className="text-xl">{title}</h2><p className="text-xs text-muted-foreground">{sub}</p></div>
-      </div>
-      {children}
-    </section>
   );
 }
