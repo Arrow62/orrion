@@ -117,6 +117,8 @@ function RootComponent() {
   const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   usePageMotion(mainRef, pathname);
+  // Opening video only when the site is first opened on the homepage.
+  const [splashOnce] = useState(pathname === "/");
   useEffect(() => {
     // A stale cached file after an app update makes a page chunk fail to load.
     // Reload once to fetch fresh files instead of leaving a blank screen.
@@ -143,7 +145,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <MotionConfig reducedMotion="user">
-          <Splash />
+          {splashOnce ? <Splash /> : null}
           <ForestBackdrop />
           <main
             ref={mainRef}
