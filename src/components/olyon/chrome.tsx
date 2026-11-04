@@ -102,7 +102,10 @@ export function BottomNav() {
   const hidden = ["/auth", "/reset-password", "/checkout"].some((p) => pathname.startsWith(p)) || pathname.startsWith("/order-success");
   if (hidden) return null;
   const isActive = (to: string, exact?: boolean) => (exact ? pathname === to : pathname.startsWith(to));
-  const tabProps = (i: number) => ({ t: tabs[i], active: isActive(tabs[i].to, "exact" in tabs[i] ? true : false) });
+  const tabProps = (i: number) => {
+    const t = tabs[i]!;
+    return { t, active: isActive(t.to, "exact" in t) };
+  };
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),0.6rem)]" aria-label="Main">
       <div className="surface relative mx-auto flex max-w-sm items-end rounded-[1.6rem] px-1.5 pb-0.5 pt-1 backdrop-blur-xl">
