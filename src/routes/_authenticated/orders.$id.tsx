@@ -1,13 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, MapPin, X } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 import { AppHeader } from "@/components/olyon/chrome";
 import { EmptyState, Skel, btn } from "@/components/olyon/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { productImage } from "@/lib/images";
 import { inr } from "@/lib/pricing";
-import { STATUS_FLOW, STATUS_LABEL } from "@/lib/order-status";
-import { cn } from "@/lib/utils";
+import { OrderTimeline } from "@/components/olyon/order-timeline";
 import { StatusPill } from "./orders.index";
 
 export const Route = createFileRoute("/_authenticated/orders/$id")({
@@ -17,6 +16,8 @@ export const Route = createFileRoute("/_authenticated/orders/$id")({
       { name: "description", content: "Items, delivery status and payment for your Orrion order." },
       { property: "og:title", content: "Order details — Orrion" },
       { property: "og:description", content: "Your Orrion order details." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: OrderDetail,
@@ -29,6 +30,7 @@ function OrderDetail() {
   const { id } = Route.useParams();
   const { data, isLoading } = useQuery({
     queryKey: ["order-detail", id],
+    refetchInterval: 30000,
     queryFn: async () => {
       const { data, error } = await supabase.from("orders").select("*, order_items(*), order_events(*)").eq("id", id).maybeSingle();
       if (error) throw error;
@@ -39,10 +41,6 @@ function OrderDetail() {
   if (isLoading) return <div><AppHeader back /><Skel className="h-96" /></div>;
   if (!data) return <div><AppHeader back /><EmptyState icon={<X className="size-6" />} title="Order not found" text="This order doesn't exist or isn't yours." action={<Link to="/orders" className={btn()}>All orders</Link>} /></div>;
 
-  const events = [...data.order_events].sort((a, b) => a.created_at.localeCompare(b.created_at));
-  const at = (s: string) => events.find((e) => e.status === s)?.created_at;
-  const cancelled = data.status === "cancelled";
-  const reached = STATUS_FLOW.indexOf(data.status);
   const a = (data.shipping_address ?? {}) as Addr;
 
   return (
@@ -61,30 +59,7 @@ function OrderDetail() {
         <div className="space-y-4">
           <section className="surface rounded-2xl p-4">
             <h2 className="mb-3 text-sm font-semibold">Delivery status</h2>
-            {cancelled ? (
-              <div className="flex items-center gap-3 rounded-xl bg-primary/10 p-3 text-sm">
-                <X className="size-4 text-primary" /> Cancelled {at("cancelled") ? `on ${fmt(at("cancelled")!)}` : ""}
-              </div>
-            ) : (
-              <ol className="relative">
-                {STATUS_FLOW.map((s, i) => {
-                  const done = i <= reached;
-                  const when = at(s);
-                  return (
-                    <li key={s} className="relative flex gap-3 pb-4 last:pb-0">
-                      {i < STATUS_FLOW.length - 1 ? <span className={cn("absolute left-[11px] top-6 h-[calc(100%-1rem)] w-px", i < reached ? "bg-olive" : "bg-border")} /> : null}
-                      <span className={cn("relative grid size-6 shrink-0 place-items-center rounded-full border", done ? "border-olive bg-olive text-olive-foreground" : "border-border")}>
-                        {done ? <Check className="size-3.5" /> : null}
-                      </span>
-                      <div className="min-w-0 pt-0.5">
-                        <p className={cn("text-sm", done ? "font-semibold" : "text-muted-foreground")}>{STATUS_LABEL[s]}</p>
-                        {when ? <p className="text-[11px] text-muted-foreground">{fmt(when)}</p> : null}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
+            <OrderTimeline status={data.status} events={data.order_events} placedAt={data.created_at} />
           </section>
 
           <section className="surface rounded-2xl p-4">

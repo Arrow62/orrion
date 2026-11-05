@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Render order-history and order-detail progress with the shared OrderTimeline and orderTimeline state model so both views agree on completion and cancellation.
