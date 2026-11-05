@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/checkout")({
       { name: "description", content: "Complete your Orrion order with cash on delivery." },
       { property: "og:title", content: "Checkout — Orrion" },
       { property: "og:description", content: "Complete your Orrion order." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Checkout,
@@ -182,19 +184,19 @@ function Checkout() {
           </section>
 
           {/* Payment */}
-          <section className="border-b border-foreground/10 py-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="flex items-center gap-4 font-display text-2xl"><CreditCard className="size-7" strokeWidth={1.4} /> Payment Method</h2>
-              <span className="flex items-center gap-1.5 text-sm"><Lock className="size-4" /> 100% Secure</span>
+          <section className="border-b border-foreground/10 py-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="flex items-center gap-2 font-display text-lg"><CreditCard className="size-5" strokeWidth={1.4} /> Payment Method</h2>
+              <span className="flex items-center gap-1 text-[11px]"><Lock className="size-3.5" /> 100% Secure</span>
             </div>
             <div className="grid grid-cols-4 items-stretch">
               {methods.map((m, idx) => (
                 <button key={m.id} disabled={!m.live} aria-pressed={m.live}
                   onClick={() => toast("Online payments are coming soon")}
-                  className={cn("relative flex flex-col items-center justify-center gap-1.5 px-1 py-3 text-center text-[0.72rem] leading-tight",
-                    m.live ? "rounded-2xl border-2 border-lime bg-olive-soft/60 text-foreground" : "text-foreground/45",
+                  className={cn("relative flex min-h-20 flex-col items-center justify-center gap-1 px-1 py-2 text-center text-[10px] leading-tight",
+                    m.live ? "rounded-lg border border-lime bg-olive-soft/60 text-foreground" : "text-foreground/45",
                     idx > 1 && "border-l border-foreground/10")}>
-                  <m.icon className={cn("size-6", m.live ? "text-lime" : "")} strokeWidth={1.5} />
+                  <m.icon className={cn("size-5", m.live ? "text-lime" : "")} strokeWidth={1.5} />
                   {m.label}
                   {!m.live ? <span className="text-[9px] uppercase tracking-wider text-foreground/40">Soon</span> : null}
                 </button>
@@ -204,20 +206,20 @@ function Checkout() {
         </div>
 
         {/* Total + place order */}
-        <aside className="h-fit py-6 lg:sticky lg:top-6">
+        <aside className="h-fit py-4 lg:sticky lg:top-6">
           <div className="space-y-2 pb-4 text-sm">
             <div className="flex justify-between"><span className="text-foreground/80">Subtotal</span><span>{inr(t.subtotal)}</span></div>
             {t.discount ? <div className="flex justify-between text-lime"><span>Coupon {code}</span><span>- {inr(t.discount)}</span></div> : null}
             <div className="flex justify-between"><span className="text-foreground/80">Shipping</span><span className={t.shipping ? "" : "text-lime"}>{t.shipping ? inr(t.shipping) : "FREE"}</span></div>
           </div>
-          <div className="grid grid-cols-[auto_1px_minmax(0,1fr)] items-center gap-5">
+          <div className="grid grid-cols-[auto_1px_minmax(0,1fr)] items-center gap-3">
             <div>
-              <p className="text-lg">Total Amount</p>
-              <p className="text-3xl font-bold text-lime">{inr(t.total)}</p>
+              <p className="text-sm">Total Amount</p>
+              <p className="text-xl font-bold text-lime">{inr(t.total)}</p>
             </div>
-            <span className="h-14 bg-foreground/40" />
-            <NightCta onClick={place} disabled={busy} className="w-full font-sans text-lg">
-              {busy ? "Placing…" : "Place Order"} <ArrowRight className="size-5" />
+            <span className="h-10 bg-foreground/40" />
+            <NightCta onClick={place} disabled={busy} className="w-full">
+              {busy ? "Placing…" : "Place Order"} <ArrowRight className="size-4" />
             </NightCta>
           </div>
         </aside>

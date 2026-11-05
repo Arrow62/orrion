@@ -18,6 +18,8 @@ export const Route = createFileRoute("/_authenticated/cart")({
       { name: "description", content: "Review the items in your Orrion cart." },
       { property: "og:title", content: "Your cart — Orrion" },
       { property: "og:description", content: "Review your Orrion cart." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CartPage,
@@ -120,14 +122,14 @@ function CartPage() {
               {coupon ? (
                 <div className="relative flex items-center gap-4">
                   <CouponIcon />
-                  <div className="min-w-0 flex-1"><p className="font-display text-lg italic">{coupon.code} applied</p><p className="text-[0.8rem] text-foreground/70">You save {inr(t.discount)}</p></div>
+                   <div className="min-w-0 flex-1"><p className="font-display text-base italic">{coupon.code} applied</p><p className="text-xs text-foreground/70">You save {inr(t.discount)}</p></div>
                   <button onClick={() => setCoupon(null)} aria-label="Remove coupon" className="grid size-9 place-items-center"><X className="size-5" /></button>
                 </div>
               ) : (
                 <>
                   <button onClick={() => setCouponOpen((o) => !o)} className="relative flex w-full items-center gap-4 text-left" aria-expanded={couponOpen}>
                     <CouponIcon />
-                    <span className="min-w-0 flex-1"><span className="block font-display text-lg italic">Apply Coupon Code</span><span className="text-[0.8rem] text-foreground/70">Get extra discounts on your order</span></span>
+                     <span className="min-w-0 flex-1"><span className="block font-display text-base italic">Apply Coupon Code</span><span className="text-xs text-foreground/70">Get extra discounts on your order</span></span>
                     <ArrowRight className={`size-5 text-lime transition-transform ${couponOpen ? "rotate-90" : ""}`} />
                   </button>
                   {couponOpen ? (
@@ -151,17 +153,17 @@ function CartPage() {
             </div>
 
             {/* Totals */}
-            <div className="space-y-2.5 py-5 text-[0.95rem]">
+            <div className="space-y-2 py-4 text-sm">
               <Row l={`Subtotal (${count} item${count === 1 ? "" : "s"})`} r={inr(t.mrp)} />
               {savings > 0 ? <Row l="Discount" r={`- ${inr(savings)}`} lime /> : null}
               <Row l="Shipping" r={t.shipping ? inr(t.shipping) : "FREE"} lime={!t.shipping} />
               <div className="!mt-4 flex items-center justify-between border-t border-foreground/15 pt-4">
-                <span className="font-display text-2xl">Total Amount</span>
-                <span className="font-display text-3xl">{inr(t.total)}</span>
+                <span className="font-display text-lg">Total Amount</span>
+                <span className="font-display text-xl">{inr(t.total)}</span>
               </div>
             </div>
             <NightCta className="w-full" onClick={() => navigate({ to: "/checkout", search: { coupon: coupon?.code } })}>
-              <ShoppingBag className="size-6" strokeWidth={1.4} /> Proceed to Checkout <ArrowRight className="size-6" strokeWidth={1.4} />
+               <ShoppingBag className="size-4" strokeWidth={1.4} /> Proceed to Checkout <ArrowRight className="size-4" strokeWidth={1.4} />
             </NightCta>
           </div>
         </div>
@@ -173,7 +175,7 @@ function CartPage() {
 
 function CouponIcon() {
   return (
-    <span className="grid size-12 shrink-0 -rotate-12 place-items-center rounded-xl border-2 border-lime text-lg font-bold text-lime">%</span>
+     <span className="grid size-9 shrink-0 -rotate-12 place-items-center rounded-lg border border-lime text-base font-bold text-lime">%</span>
   );
 }
 

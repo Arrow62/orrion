@@ -149,7 +149,7 @@ function RootComponent() {
           <ForestBackdrop />
           <main
             ref={mainRef}
-            className="mx-auto min-h-screen w-full max-w-md px-4 pb-safe-nav md:max-w-3xl md:px-6 lg:max-w-6xl"
+            className={`mx-auto w-full max-w-md px-4 md:max-w-3xl md:px-6 lg:max-w-6xl ${pathname === "/cart" || pathname === "/checkout" ? "pb-0" : "min-h-screen pb-safe-nav"}`}
           >
             <Outlet />
           </main>

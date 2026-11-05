@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import forest from "@/assets/night-forest-magpie.jpg";
 import stream from "@/assets/night-forest-stream.jpg";
 import { CartButton } from "./chrome";
+import { Button } from "@/components/ui/button";
 
 /** Transparent header + forest painting with the magpie, used by cart and checkout. */
 export function NightHero({ eyebrow, title, sub, back, cart = true, children }: {
@@ -75,13 +76,13 @@ export function NightFooter() {
 /** Crimson pill CTA with leaf watermark. */
 export function NightCta({ children, onClick, disabled, className = "" }: { children: ReactNode; onClick?: () => void; disabled?: boolean; className?: string }) {
   return (
-    <button onClick={onClick} disabled={disabled}
-      className={`night-cta relative flex h-16 items-center justify-center gap-4 overflow-hidden rounded-full font-display text-xl text-primary-foreground transition active:scale-[0.98] disabled:opacity-60 ${className}`}>
+    <Button onClick={onClick} disabled={disabled}
+      className={`night-cta relative flex h-12 items-center justify-center gap-2 overflow-hidden rounded-full font-sans text-sm text-primary-foreground transition active:scale-[0.98] disabled:opacity-60 ${className}`}>
       <svg viewBox="0 0 120 60" className="pointer-events-none absolute left-2 top-0 h-full opacity-20" aria-hidden>
         <path d="M10 55 C30 20 60 8 100 6 C80 25 55 45 10 55Z" fill="currentColor" />
         <path d="M10 55 C40 35 70 20 100 6" stroke="currentColor" strokeWidth="1" fill="none" />
       </svg>
       {children}
-    </button>
+    </Button>
   );
 }
