@@ -10,6 +10,9 @@ import { productImage } from "@/lib/images";
 import { inr } from "@/lib/pricing";
 import { STATUS_LABEL } from "@/lib/order-status";
 import { cn } from "@/lib/utils";
+import { OrderTimeline } from "@/components/olyon/order-timeline";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/orders/")({
   head: () => ({
@@ -18,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/orders/")({
       { name: "description", content: "Review your past Orrion purchases and track deliveries." },
       { property: "og:title", content: "My orders — Orrion" },
       { property: "og:description", content: "Your Orrion order history." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Orders,
@@ -31,11 +36,15 @@ const FILTERS = [
 ] as const;
 
 function Orders() {
+  const { user } = useAuth();
   const [f, setF] = useState<(typeof FILTERS)[number]["k"]>("all");
   const { data, isLoading } = useQuery({
-    queryKey: ["orders"],
+    queryKey: ["orders", user?.id],
+    enabled: !!user,
+    refetchInterval: 30000,
     queryFn: async () => {
-      const { data, error } = await supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false });
+      if (!user) return [];
+      const { data, error } = await supabase.from("orders").select("*, order_items(*), order_events(*)").eq("user_id", user.id).order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -49,11 +58,11 @@ function Orders() {
       <ForestPageHeader code="Order log" title="My Orders" sub={`${data?.length ?? 0} orders placed`} />
       <div className="no-scrollbar -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
         {FILTERS.map((x) => (
-          <button key={x.k} onClick={() => setF(x.k)} aria-pressed={f === x.k}
+          <Button variant="ghost" key={x.k} onClick={() => setF(x.k)} aria-pressed={f === x.k}
             className={cn("h-8 shrink-0 rounded-full border px-4 text-xs font-semibold transition",
               f === x.k ? "border-olive bg-olive text-olive-foreground" : "border-border text-muted-foreground")}>
             {x.t}
-          </button>
+          </Button>
         ))}
       </div>
       {isLoading ? (
@@ -87,6 +96,7 @@ function Orders() {
                   <span className="text-sm font-bold">{inr(o.total)}</span>
                   <ChevronRight className="size-4 text-muted-foreground" />
                 </div>
+                <OrderTimeline status={o.status} events={o.order_events} placedAt={o.created_at} compact />
               </Link>
             );
           })}
