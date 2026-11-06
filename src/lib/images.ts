@@ -23,6 +23,6 @@ export const imageKeys = Object.keys(productImages);
 /** Resolve a product image key or absolute URL to a displayable src. */
 export function productImage(key: string | null | undefined): string {
   if (!key) return galaxy;
-  if (key.startsWith("http")) return key;
+  if (key.startsWith("http") || key.startsWith("/__l5e/assets-v1/")) return key;
   return productImages[key] ?? galaxy;
 }
