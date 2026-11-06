@@ -278,6 +278,7 @@ export type Database = {
           description: string
           featured: boolean
           features: string[]
+          gallery: string[]
           id: string
           image: string
           name: string
@@ -286,6 +287,8 @@ export type Database = {
           reviews: number
           slug: string
           stock: number
+          supplier_details: Json
+          supplier_url: string | null
           tagline: string
           trending: boolean
         }
@@ -299,6 +302,7 @@ export type Database = {
           description?: string
           featured?: boolean
           features?: string[]
+          gallery?: string[]
           id?: string
           image: string
           name: string
@@ -307,6 +311,8 @@ export type Database = {
           reviews?: number
           slug: string
           stock?: number
+          supplier_details?: Json
+          supplier_url?: string | null
           tagline?: string
           trending?: boolean
         }
@@ -320,6 +326,7 @@ export type Database = {
           description?: string
           featured?: boolean
           features?: string[]
+          gallery?: string[]
           id?: string
           image?: string
           name?: string
@@ -328,6 +335,8 @@ export type Database = {
           reviews?: number
           slug?: string
           stock?: number
+          supplier_details?: Json
+          supplier_url?: string | null
           tagline?: string
           trending?: boolean
         }
