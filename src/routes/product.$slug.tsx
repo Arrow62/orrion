@@ -13,6 +13,7 @@ import { inr, percentOff, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import { colorsOf, productQuery, productsQuery, useAddToCart, useToggleWishlist } from "@/lib/shop";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/product/$slug")({
   head: ({ params }) => {
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/product/$slug")({
         { property: "og:title", content: `${name} — Orrion` },
         { property: "og:description", content: `Shop ${name} on Orrion.` },
         { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },
@@ -104,6 +106,8 @@ function ProductPage() {
   const soldOut = p.stock <= 0;
   const saved = wl.has(p.id);
   const related = (all.data ?? []).filter((x) => x.category === p.category && x.id !== p.id).slice(0, 4);
+  const shots = p.gallery.length ? p.gallery.map((image, index) => ({ image, label: `Photo ${index + 1}`, cls: "object-contain" })) : views.map((v) => ({ ...v, image: p.image }));
+  const shot = shots[view] ?? shots[0];
 
   const buyNow = () => {
     if (!user) {
@@ -122,7 +126,7 @@ function ProductPage() {
           <div className="absolute inset-0 grid-lines opacity-70" />
           <div className="relative flex items-center justify-between px-4 pt-4 font-mono-ui text-[9px] uppercase text-muted-foreground">
             <span>Specimen / {p.category}</span>
-            <span>View {String(view + 1).padStart(2, "0")}—{String(views.length).padStart(2, "0")}</span>
+            <span>View {String(view + 1).padStart(2, "0")}—{String(shots.length).padStart(2, "0")}</span>
           </div>
           <div className="relative mx-auto my-4 aspect-square w-[82%] max-w-md">
             <svg data-orbit viewBox="0 0 200 200" className="absolute inset-[-6%] size-[112%] text-olive/50" aria-hidden>
@@ -130,10 +134,10 @@ function ProductPage() {
               <circle cx="100" cy="2" r="2.2" className="fill-primary" />
               <circle cx="2" cy="100" r="1.4" className="fill-olive" />
             </svg>
-            <div data-portal className="absolute inset-0 overflow-hidden rounded-full ring-1 ring-foreground/10 shadow-lift">
-              <img key={view} data-shot src={productImage(p.image)} alt={`${p.name} — ${views[view]!.label}`} width={800} height={800}
-                className={cn("size-full object-cover transition-transform duration-700", views[view]!.cls)} />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,transparent_40%,var(--forest)_100%)]" />
+            <div data-portal className={cn("absolute inset-0 overflow-hidden ring-1 ring-foreground/10 shadow-lift", p.supplier_url ? "rounded-lg" : "rounded-full")}>
+              <img key={view} data-shot src={productImage(shot?.image)} alt={`${p.name} — ${shot?.label ?? "Photo"}`} width={800} height={800}
+                className={cn("size-full transition-transform duration-700", shot?.cls)} />
+              {!p.supplier_url ? <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,transparent_40%,var(--forest)_100%)]" /> : null}
             </div>
             {p.features.slice(0, 3).map((f, i) => {
               const pos = [
@@ -147,12 +151,12 @@ function ProductPage() {
               );
             })}
           </div>
-          <div className="relative flex items-center justify-center gap-2 pb-4">
-            {views.map((v, i) => (
-              <button key={v.label} onClick={() => setView(i)} aria-label={`Show ${v.label}`} aria-pressed={view === i}
-                className={cn("size-11 overflow-hidden rounded-full ring-1 transition", view === i ? "ring-2 ring-olive" : "opacity-50 ring-border hover:opacity-90")}>
-                <img src={productImage(p.image)} alt="" loading="lazy" width={88} height={88} className={cn("size-full object-cover", v.cls)} />
-              </button>
+          <div className="relative flex flex-wrap items-center justify-center gap-2 px-4 pb-4">
+            {shots.map((v, i) => (
+              <Button variant="ghost" size="icon" key={v.label} onClick={() => setView(i)} aria-label={`Show ${v.label}`} aria-pressed={view === i}
+                className={cn("size-11 shrink-0 overflow-hidden rounded-lg p-0 ring-1 transition", view === i ? "ring-2 ring-olive" : "opacity-50 ring-border hover:opacity-90")}>
+                <img src={productImage(v.image)} alt="" loading="lazy" width={88} height={88} className={cn("size-full", v.cls)} />
+              </Button>
             ))}
           </div>
           {p.badge ? (
@@ -178,7 +182,7 @@ function ProductPage() {
 
           <dl data-in className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface/60 font-mono-ui text-[10px] uppercase">
             {[
-              ["Rating", <span key="r" className="flex items-center gap-1.5 normal-case"><Stars rating={Number(p.rating)} className="[&_svg]:size-3" />{Number(p.rating).toFixed(1)} · {p.reviews.toLocaleString("en-IN")}</span>],
+              ["Rating", p.reviews ? <span key="r" className="flex items-center gap-1.5 normal-case"><Stars rating={Number(p.rating)} className="[&_svg]:size-3" />{Number(p.rating).toFixed(1)} · {p.reviews.toLocaleString("en-IN")}</span> : "Not yet reviewed"],
               ["Status", <span key="s" className={soldOut ? "text-destructive" : p.stock <= 10 ? "text-primary" : "text-success"}>{soldOut ? "Out of stock" : p.stock <= 10 ? `Only ${p.stock} left` : "In stock"}</span>],
               ["Shipping", `Free above ₹${FREE_SHIPPING_THRESHOLD}`],
               ["Payment", "Cash on delivery"],
@@ -190,7 +194,8 @@ function ProductPage() {
             ))}
           </dl>
 
-          <p data-in className="mt-4 text-[0.82rem] leading-relaxed text-muted-foreground">{p.description}</p>
+          <p data-in className="mt-4 whitespace-pre-line text-[0.82rem] leading-relaxed text-muted-foreground">{p.description}</p>
+          {p.supplier_url ? <a href={p.supplier_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-xs text-olive underline">Original supplier listing</a> : null}
 
           <div data-in className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4">
             {colors.length ? (
@@ -238,7 +243,7 @@ function ProductPage() {
       <Highlights p={p} />
       <div className="lg:grid lg:grid-cols-2 lg:gap-4">
         <DeliveryInfo />
-        <RatingsSummary p={p} />
+        {p.reviews > 0 ? <RatingsSummary p={p} /> : null}
       </div>
       <ProductFaq p={p} />
 
