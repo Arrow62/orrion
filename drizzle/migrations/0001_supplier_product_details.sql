@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS gallery text[] NOT NULL DEFAULT '{}', ADD COLUMN IF NOT EXISTS supplier_url text, ADD COLUMN IF NOT EXISTS supplier_details jsonb NOT NULL DEFAULT '{}'::jsonb;
